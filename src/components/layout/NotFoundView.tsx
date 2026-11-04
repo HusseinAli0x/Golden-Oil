@@ -14,8 +14,8 @@ export function NotFoundView({ locale, dict }: { locale: Locale; dict: Dictionar
           <div aria-hidden className="text-[110px] font-extrabold leading-[0.9] tracking-[-6px] text-primary min-[760px]:text-[180px]">
             {t.big}
           </div>
-          <h1 className="m-0 text-[32px] font-bold leading-[1.15] min-[760px]:text-[40px]">{t.title}</h1>
-          <p className="m-0 max-w-[460px] text-[17px] leading-[1.65] text-muted">{t.text}</p>
+          <h1 className="m-0 text-[clamp(28px,2vw+22px,40px)] font-bold leading-[1.15]">{t.title}</h1>
+          <p className="m-0 max-w-[460px] text-lead leading-[1.65] text-muted">{t.text}</p>
           <div className="mt-2 flex flex-wrap gap-3">
             <Link href={localePath(locale)} className="btn btn-primary">
               <House size={18} aria-hidden />

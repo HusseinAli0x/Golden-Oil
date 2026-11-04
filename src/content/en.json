@@ -8,7 +8,7 @@
     },
     "about": {
       "title": "About Us | Golden Oil Refinery (GOR)",
-      "description": "About Golden Oil Refinery (GOR), an industrial refining facility in Najaf, Iraq, part of Al Shabaka Al Thahabiya Trading LLC."
+      "description": "About Golden Oil Refinery (GOR), an industrial refining facility in Najaf, Iraq."
     },
     "facilities": {
       "title": "Facilities | Golden Oil Refinery (GOR)",
@@ -58,7 +58,6 @@
     },
     "crumbHome": "Home",
     "breadcrumbAria": "Breadcrumb",
-    "parentLine": "Golden Oil Refinery (GOR) — part of Al Shabaka Al Thahabiya Trading LLC.",
     "address": "Haidariya Power Station Street, Karbala–Najaf Road, Lamppost No. 410, Najaf, Iraq.",
     "gorLogoAlt": "Golden Oil Refinery (GOR) logo",
     "pending": "Pending approval",
@@ -72,28 +71,6 @@
       "contact": "CONTACT",
       "rights": "All rights reserved.",
       "illus": "Process visuals are illustrative and not to scale."
-    },
-    "contactBand": {
-      "title": "Contact the refinery",
-      "text": "To order or ask about pricing and availability, reach Golden Oil Refinery directly or send an enquiry.",
-      "cta": "Send an enquiry"
-    },
-    "parentIdentity": "Golden Oil Refinery maintains its own identity and operations, while benefiting from the strength of its parent company.",
-    "parentLogosAria": "Golden Oil Refinery and Al Shabaka Al Thahabiya logos",
-    "parentLogoAlt": "Al Shabaka Al Thahabiya logo",
-    "contactBlock": {
-      "title": "Contact the Refinery",
-      "lead": "Reach Golden Oil Refinery directly by phone or email, or find us on the map.",
-      "name": "Golden Oil Refinery (GOR)",
-      "addressL": "Address",
-      "phoneL": "Phone",
-      "emailL": "Email",
-      "companyL": "Company",
-      "company": "Al Shabaka Al Thahabiya Trading LLC",
-      "mapsCta": "Open in Google Maps",
-      "mapsAria": "Open the refinery address in Google Maps (opens in a new tab)",
-      "callCta": "Call now",
-      "emailCta": "Send an email"
     }
   },
   "home": {
@@ -274,7 +251,6 @@
     "fProdNote": "Bitumen is supplied in two grades: 40–50 and 60–70.",
     "fEstL": "Established",
     "fEst": "2024",
-    "parTi": "Part of Al Shabaka Al Thahabiya Trading LLC",
     "valTi": "Vision, mission, values and commitment",
     "valLead": "",
     "values": [
@@ -405,13 +381,13 @@
     "title": "Safety, quality and responsibility",
     "lead": "How Golden Oil Refinery approaches product quality, people’s safety and the environment.",
     "qm": {
-      "title": "Quality management",
-      "text": "[Quality management approach — to be provided by GOR]",
+      "title": "Quality Management",
+      "text": "Committed to maintaining high quality standards through continuous monitoring, reliable processes, and operational excellence.",
       "items": []
     },
     "pq": {
-      "title": "Product quality",
-      "text": "[Product quality and testing approach — to be provided by GOR]",
+      "title": "Product Quality",
+      "text": "Our products undergo careful quality control and testing to ensure consistency, reliability, and compliance with industry standards.",
       "items": []
     },
     "hs": {
@@ -514,9 +490,53 @@
     "email": "Email",
     "phone": "Phone",
     "message": "Message",
-    "send": "Send enquiry",
-    "note": "Sending opens your email app with the enquiry filled in.",
+    "send": "Send Message",
+    "note": "Your enquiry is sent directly to the refinery team.",
     "required": "required",
-    "other": "Other / not sure yet"
+    "other": "Other / not sure yet",
+    "subject": "Subject",
+    "sending": "Sending…",
+    "success": "Your enquiry has been sent successfully. Thank you for contacting Golden Oil Refinery.",
+    "error": "Sorry, your enquiry could not be sent. Please try again in a few minutes.",
+    "errRequired": "Please fill in this field.",
+    "errEmail": "Please enter a valid email address.",
+    "errShort": "Please write a little more (at least 10 characters).",
+    "errRate": "Too many enquiries were sent from this connection. Please try again later.",
+    "errSpam": "Your enquiry could not be verified. Please wait a moment and try again.",
+    "website": "Leave this field empty"
+  },
+  "vacuum": {
+    "s1a": "Vacuum",
+    "s1b": "Distillation Unit",
+    "s1p": "Heavy feed is separated under deep vacuum, so it boils at far lower temperatures than it would at atmospheric pressure. Scroll to travel inside the column.",
+    "s2": "Low pressure, gentle heat",
+    "s2p": "Reducing the pressure lowers boiling points and limits thermal cracking of the heavy molecules. The shell opens to show the internals: packed beds, collector trays, the flash zone and the stripping section.",
+    "s3": "Vapor rises, liquid falls",
+    "s3p": "Hot feed enters the flash zone and partly vaporizes. Vapor climbs through the beds while cooler liquid runs down over them; at every surface heat and mass are exchanged, so each level settles at its own boiling range. Steam strips the last light material out of the bottom liquid.",
+    "lgFeed": "Hot feed",
+    "lgVap": "Rising vapor",
+    "lgLiq": "Falling liquid",
+    "lgSteam": "Stripping steam",
+    "lgVac": "To vacuum system",
+    "lvgoN": "Light Vacuum Gas Oil",
+    "lvgoP": "The lightest liquid product. It condenses in the upper section and is drawn off a collector tray near the top of the vacuum section.",
+    "lvgoNote": "Typical routing: conversion units or blending, depending on the refinery.",
+    "hvgoN": "Heavy Vacuum Gas Oil",
+    "hvgoP": "A heavier cut, condensed lower in the column and drawn from a second collector tray below the LVGO section.",
+    "hvgoNote": "Typical routing: conversion feed or fuel / lube components, depending on the refinery.",
+    "resCode": "Residue",
+    "resN": "Vacuum residue",
+    "resP": "The heaviest part of the feed never vaporizes. It collects in the bottom of the column and leaves through the bottom outlet.",
+    "resNote": "Bitumen is made downstream from suitable vacuum residue. It is not drawn directly from the tower.",
+    "s5": "One feed in, three streams out",
+    "s5p": "Illustrative configuration. Real columns differ in internals, sizes and draw-offs from plant to plant.",
+    "tagBit": "Downstream: bitumen from suitable residue",
+    "tagFeed": "Hot feed from the furnace",
+    "rail": "Chapters",
+    "view": "View product",
+    "ourProds": "Our products",
+    "s5b": "Select a barrel or a product name to open its page.",
+    "hint": "Scroll",
+    "foot": "Illustrative visualization · not to scale · not a specific plant"
   }
 }

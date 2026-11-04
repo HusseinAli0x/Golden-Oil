@@ -69,5 +69,4 @@ export const IMAGES = {
   about: "/images/about-entrance-sign.jpg",
   modelFallback: "/images/site-model-fallback.jpg",
   logo: "/logos/gor-logo.svg",
-  parentLogo: "/logos/al-shabaka-al-thahabiya-logo.svg",
 } as const;

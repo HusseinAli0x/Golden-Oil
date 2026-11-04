@@ -16,7 +16,7 @@ export function CtaBand({ title, text, titleId, children }: CtaBandProps) {
         className="pointer-events-none absolute -end-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(closest-side,rgb(224_123_42/0.35),transparent)]"
       />
       <div className="relative flex max-w-[640px] flex-col gap-2">
-        <h2 id={titleId} className="m-0 text-[26px] font-bold text-white min-[900px]:text-[28px]">
+        <h2 id={titleId} className="m-0 text-[clamp(22px,1vw+19px,28px)] font-bold leading-tight text-white">
           {title}
         </h2>
         <p className="m-0 text-[15px] leading-relaxed text-border-strong">{text}</p>

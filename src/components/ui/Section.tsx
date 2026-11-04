@@ -33,7 +33,7 @@ export function SectionHeading({ id, title, lead, aside }: SectionHeadingProps) 
         <h2 id={id} className="h2">
           {title}
         </h2>
-        {lead && <p className="m-0 text-[17px] leading-[1.7] text-muted">{lead}</p>}
+        {lead && <p className="m-0 text-lead text-muted">{lead}</p>}
       </div>
       {aside}
     </div>

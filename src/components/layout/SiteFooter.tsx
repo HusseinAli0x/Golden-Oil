@@ -8,7 +8,7 @@ interface SiteFooterProps {
 }
 
 const colTitle = "text-xs font-semibold tracking-[1.5px] text-white";
-const footLink = "self-start text-border-strong no-underline transition-colors hover:text-white";
+const footLink = "-my-[5px] min-w-10 self-start py-[10px] text-border-strong no-underline transition-colors hover:text-white";
 
 export function SiteFooter({ locale, dict }: SiteFooterProps) {
   const t = dict.common;

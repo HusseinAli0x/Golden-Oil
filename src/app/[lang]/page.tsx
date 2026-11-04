@@ -7,8 +7,7 @@ import { Hero } from "@/components/home/Hero";
 import { ProcessPipe } from "@/components/home/ProcessPipe";
 import { ProductShowcase } from "@/components/products/ProductShowcase";
 import { SiteModelEmbed } from "@/components/three/SiteModelEmbed";
-import { ContactRefinery } from "@/components/ui/ContactRefinery";
-import { ParentBrand } from "@/components/ui/ParentBrand";
+import { VacuumSection } from "@/components/vacuum/VacuumSection";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { getDictionary, isLocale, localePath } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
@@ -42,14 +41,13 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       addressLocality: "Najaf",
       addressCountry: "IQ",
     },
-    parentOrganization: { "@type": "Organization", name: "Al Shabaka Al Thahabiya Trading LLC" },
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 
-      <Hero t={t} parentLine={dict.common.parentLine} />
+      <Hero t={t} />
 
       <Section id="film" titleId="film-title">
         <SectionHeading id="film-title" title={t.filmTitle} lead={t.filmText} />
@@ -64,6 +62,9 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         />
         <ProcessPipe stages={t.stages} />
       </Section>
+
+      <div className="pt-20 min-[900px]:pt-[104px]" aria-hidden />
+      <VacuumSection t={dict.vacuum} locale={lang} />
 
       <Section id="explore" titleId="explore-title">
         <SectionHeading id="explore-title" title={t.expTitle} lead={t.expText} />
@@ -81,8 +82,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             <h2 id="about-title" className="h2">
               {t.aboutTitle}
             </h2>
-            <p className="m-0 text-[17px] leading-[1.8] text-ink-soft">{t.aboutText}</p>
-            <Link href={localePath(lang, "/about")} className="group inline-flex items-center gap-2 self-start text-[15px] font-semibold text-primary">
+            <p className="m-0 text-lead text-ink-soft">{t.aboutText}</p>
+            <Link href={localePath(lang, "/about")} className="group -my-2.5 inline-flex items-center gap-2 self-start py-2.5 text-[15px] font-semibold text-primary">
               {t.aboutLink}
               <ArrowRight size={16} aria-hidden className="transition-transform group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" />
             </Link>
@@ -93,11 +94,6 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         </div>
       </Section>
 
-      <Section id="parent" titleId="parent-title">
-        <ParentBrand common={dict.common} titleId="parent-title" />
-      </Section>
-
-      <ContactRefinery common={dict.common} />
       <div className="pb-[110px]" />
     </>
   );

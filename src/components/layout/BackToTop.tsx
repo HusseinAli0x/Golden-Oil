@@ -19,8 +19,12 @@ export function BackToTop({ label }: { label: string }) {
       subscribeScroll((p, y) => {
         setVisible(y > 160);
         const pos = Math.min(Math.max(p, 0), 1) * (LEVELS - 1);
+        // Lower state stays fully opaque and the next one fades in on top, so the
+        // (transparent-background) barrel never looks see-through mid-crossfade.
+        const base = Math.min(Math.floor(pos), LEVELS - 1);
+        const frac = pos - base;
         imgs.current.forEach((el, i) => {
-          if (el) el.style.opacity = String(Math.max(0, 1 - Math.abs(pos - i)));
+          if (el) el.style.opacity = String(i === base ? 1 : i === base + 1 ? frac : 0);
         });
       }),
     [],
@@ -47,7 +51,7 @@ export function BackToTop({ label }: { label: string }) {
       title={label}
       tabIndex={visible ? 0 : -1}
       aria-hidden={!visible}
-      className={`barrel fixed bottom-5 end-5 z-50 h-[68px] w-[68px] cursor-pointer overflow-hidden rounded-full border border-border bg-[#F4F6F8] p-0 shadow-[0_10px_28px_rgb(16_24_32/0.16)] transition-[opacity,transform] duration-300 hover:-translate-y-[3px] ${
+      className={`barrel fixed bottom-5 end-5 z-50 h-[68px] w-[68px] cursor-pointer rounded-xl border-0 bg-transparent p-0 transition-[opacity,transform] duration-300 hover:-translate-y-[3px] ${
         visible ? "opacity-100" : "pointer-events-none translate-y-3 opacity-0"
       }`}
     >

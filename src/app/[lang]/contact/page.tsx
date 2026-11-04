@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { InquiryForm } from "@/components/contact/InquiryForm";
-import { ContactRefinery } from "@/components/ui/ContactRefinery";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 import { getDictionary, isLocale } from "@/lib/i18n";
@@ -24,8 +23,6 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
     <>
       <PageHero locale={lang} common={dict.common} crumb={t.crumb} title={t.title} lead={t.lead} />
 
-      <ContactRefinery common={dict.common} id="refinery-contact" headingLevel="page" />
-
       <Section label={t.formTi} className="pb-[110px] pt-16" innerClassName="grid items-start gap-6 min-[1000px]:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
         <div className="reveal flex flex-col gap-4">
           <div className="relative aspect-[16/10] overflow-hidden rounded-[var(--radius-card)] bg-dark">
@@ -35,7 +32,7 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
 
         <div className="card reveal p-6 min-[900px]:p-9">
           <h2 className="m-0 mb-6 text-2xl font-bold">{t.formTi}</h2>
-          <InquiryForm t={t} products={productOptions} />
+          <InquiryForm t={t} products={productOptions} locale={lang} />
         </div>
       </Section>
     </>

@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
 import { LANG_STORAGE_KEY, localePath, otherLocale, switchLocalePath, type Dictionary, type Locale } from "@/lib/i18n";
 import { IMAGES, NAV_ITEMS } from "@/lib/site";
+import { OilBurger } from "@/components/nav/OilBurger";
+import { OilUnderline } from "@/components/nav/OilUnderline";
 
 interface SiteHeaderProps {
   locale: Locale;
@@ -61,16 +62,17 @@ export function HeaderBar({ locale, t, pathname: current }: HeaderBarProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-bg/95 backdrop-blur supports-[backdrop-filter]:bg-bg/85">
       <div className="flex items-center justify-between gap-4 px-5 py-3 min-[900px]:px-10 min-[900px]:py-3.5">
-        <Link href={localePath(locale)} aria-label={t.homeAria} className="flex shrink-0 items-center">
+        <Link href={localePath(locale)} aria-label={t.homeAria} className="-m-2.5 flex shrink-0 items-center p-2.5">
           <Image src={IMAGES.logo} alt="" width={24} height={39} preload unoptimized className="block h-[39px] w-6" />
         </Link>
 
-        <nav aria-label={t.navAria} className="hidden items-center gap-[22px] min-[1080px]:flex">
+        <nav aria-label={t.navAria} className="relative hidden items-center gap-[22px] min-[1080px]:flex">
           {links.map((l) => (
             <Link key={l.key} href={l.href} className="navlink" aria-current={l.current ? "page" : undefined}>
               {t.nav[l.key]}
             </Link>
           ))}
+          <OilUnderline activeIndex={links.findIndex((l) => l.current)} locale={locale} />
         </nav>
 
         <div className="flex items-center gap-2.5">
@@ -92,7 +94,7 @@ export function HeaderBar({ locale, t, pathname: current }: HeaderBarProps) {
             aria-label={open ? t.menuClose : t.menu}
             className="btn btn-outline min-h-10 w-11 px-0 min-[1080px]:hidden"
           >
-            {open ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
+            <OilBurger open={open} />
           </button>
         </div>
       </div>

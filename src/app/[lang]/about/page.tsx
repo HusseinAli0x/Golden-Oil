@@ -1,8 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Calendar, CircleCheck, Droplet, Eye, Factory, Gauge, Handshake, MapPin, ShieldCheck, Split, Target } from "lucide-react";
-import { ContactBand } from "@/components/ui/ContactBand";
-import { ParentBrand } from "@/components/ui/ParentBrand";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { getDictionary, isLocale } from "@/lib/i18n";
@@ -37,7 +35,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
         <SectionHeading id="who-title" title={t.whoTi} />
         <div className="flex flex-wrap gap-8">
           <div className="flex min-w-0 flex-[1_1_520px] flex-col gap-4">
-            <p className="m-0 text-xl leading-[1.7]">{t.whoText}</p>
+            <p className="m-0 text-[clamp(17px,0.9vw+14px,20px)] leading-[1.7]">{t.whoText}</p>
             <p className="m-0 text-[15px] leading-[1.7] text-muted">{t.whoText2}</p>
           </div>
           <div className="relative aspect-[4/3] min-w-0 flex-[1_1_300px] overflow-hidden rounded-[18px]">
@@ -53,7 +51,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
               </div>
               <div>
                 <p className="m-0 text-[13px] text-subtle">{label}</p>
-                <p className="m-0 mt-1.5 text-[22px] font-bold">{value}</p>
+                <p className="m-0 mt-1.5 text-title font-bold">{value}</p>
               </div>
             </article>
           ))}
@@ -62,7 +60,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
               <Split size={26} strokeWidth={1.6} aria-hidden />
             </div>
             <p className="m-0 text-[13px] text-subtle">{t.fProdL}</p>
-            <p className="m-0 text-[22px] font-bold" dir="ltr">
+            <p className="m-0 text-title font-bold" dir="ltr">
               VDO · LVGO · HVGO · Bitumen
             </p>
             <p className="m-0 text-sm leading-relaxed text-subtle">{t.fProdNote}</p>
@@ -73,15 +71,10 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
             </div>
             <div>
               <p className="m-0 text-[13px] text-subtle">{t.fEstL}</p>
-              <p className="m-0 mt-1.5 text-[22px] font-bold">{t.fEst}</p>
+              <p className="m-0 mt-1.5 text-title font-bold">{t.fEst}</p>
             </div>
           </article>
         </div>
-      </Section>
-
-      <Section id="parent" titleId="parent-title" className="pt-20 min-[900px]:pt-[88px]">
-        <SectionHeading id="parent-title" title={t.parTi} />
-        <ParentBrand common={dict.common} />
       </Section>
 
       <Section id="values" titleId="values-title" className="pt-20 min-[900px]:pt-[88px]">
@@ -94,7 +87,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
                 <div className="ico">
                   <Icon size={26} strokeWidth={1.6} aria-hidden />
                 </div>
-                <h3 className="m-0 text-[22px] font-bold">{v.title}</h3>
+                <h3 className="m-0 text-title font-bold">{v.title}</h3>
                 {v.text && <p className="m-0 text-base leading-[1.75] text-muted">{v.text}</p>}
                 {v.list.length > 0 && (
                   <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
@@ -112,7 +105,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
         </div>
       </Section>
 
-      <ContactBand common={dict.common} locale={lang} />
+      <div aria-hidden className="pb-[88px] min-[900px]:pb-[110px]" />
     </>
   );
 }

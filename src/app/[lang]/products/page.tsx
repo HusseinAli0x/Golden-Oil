@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { ContactBand } from "@/components/ui/ContactBand";
 import { ProductShowcase } from "@/components/products/ProductShowcase";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
@@ -24,7 +23,7 @@ export default async function ProductsPage({ params }: PageProps<"/[lang]/produc
         <ProductShowcase t={dict.products} common={dict.common} />
         <p className="m-0 text-sm text-subtle">{t.photoNote}</p>
       </Section>
-      <ContactBand common={dict.common} locale={lang} />
+      <div aria-hidden className="pb-[88px] min-[900px]:pb-[110px]" />
     </>
   );
 }

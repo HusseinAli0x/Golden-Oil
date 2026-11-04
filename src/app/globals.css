@@ -25,6 +25,16 @@
   --font-sans: var(--font-sora), system-ui, sans-serif;
   --font-arabic: var(--font-plex-arabic), var(--font-sora), system-ui, sans-serif;
 
+  /* Fluid type scale: one size per role, scaling smoothly from phone to desktop. */
+  --text-display: clamp(34px, 5.4vw + 16px, 68px);
+  --text-display--line-height: 1.04;
+  --text-title: clamp(19px, 0.75vw + 16px, 22px);
+  --text-title--line-height: 1.3;
+  --text-lead: clamp(16px, 0.35vw + 14.75px, 18px);
+  --text-lead--line-height: 1.7;
+  --text-body: clamp(15px, 0.2vw + 14.3px, 16px);
+  --text-body--line-height: 1.7;
+
   --radius-card: 18px;
   --container-site: 1240px;
 
@@ -83,7 +93,7 @@
 
   .h1 {
     margin: 0;
-    font-size: 38px;
+    font-size: clamp(32px, 4.2vw + 18px, 56px);
     line-height: 1.05;
     font-weight: 700;
     letter-spacing: -1.2px;
@@ -91,16 +101,17 @@
   }
   .h2 {
     margin: 0;
-    font-size: 30px;
+    font-size: clamp(26px, 2.6vw + 18px, 42px);
     line-height: 1.1;
     font-weight: 700;
     letter-spacing: -0.8px;
     text-wrap: balance;
   }
-  @media (min-width: 900px) {
-    .h1 { font-size: 56px; }
-    .h2 { font-size: 42px; }
+  @media (max-width: 599px) {
+    .h1 { letter-spacing: -0.6px; }
+    .h2 { letter-spacing: -0.4px; }
   }
+  :is(h1, h2, h3, .h1, .h2) { overflow-wrap: break-word; hyphens: manual; }
   [dir="rtl"] :is(.h1, .h2, .hero-title) {
     letter-spacing: 0;
     line-height: 1.3;
@@ -193,8 +204,8 @@
     transition: border-color 0.2s ease;
     white-space: nowrap;
   }
-  .navlink:hover { border-bottom-color: var(--color-accent); }
-  .navlink[aria-current="page"] { border-bottom-color: var(--color-primary); font-weight: 600; }
+  /* The underline itself is drawn by <OilUnderline> (liquid line); the border stays transparent to keep metrics. */
+  .navlink[aria-current="page"] { font-weight: 600; }
 
   /* Small scroll-linked reveal; pure CSS, so content is never hidden without support. */
   @supports (animation-timeline: view()) {
@@ -296,24 +307,161 @@
 @keyframes pj-q { 0%, 100% { transform: translateY(0); opacity: 0.55; } 50% { transform: translateY(-6px); opacity: 1; } }
 .pj-q { animation: pj-q 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 
-/* ── Intro: short logo reveal (~2.3 s, then a 0.4 s fade) ───────────── */
-@keyframes lg-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+/* ── Intro: Golden Network Holding mark drawn stroke by stroke (design/Intro.dc.html) ── */
+@keyframes gr-draw { to { stroke-dashoffset: 0; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes hub-in { 0% { transform: scale(0); opacity: 0; } 60% { transform: scale(1.6); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes hub-halo { 0% { transform: scale(0.4); opacity: 0; } 40% { opacity: 0.7; } 100% { transform: scale(3.2); opacity: 0; } }
+@keyframes lg-pop { 0% { transform: scale(1); } 40% { transform: scale(1.03); } 100% { transform: scale(1); } }
 @keyframes lg-glow { 0% { opacity: 0; transform: scale(0.6); } 50% { opacity: 0.5; } 100% { opacity: 0; transform: scale(1.25); } }
 @keyframes tx-wipe { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
-@keyframes tx-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes tx-track { from { opacity: 0; letter-spacing: 0.5em; } to { opacity: 1; letter-spacing: 0.22em; } }
+@keyframes tx-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes tx-track { from { opacity: 0; letter-spacing: 0.6em; } to { opacity: 1; letter-spacing: 0.22em; } }
 @keyframes tx-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.intro-root .gr { display: none; }
+.intro-root.play .gr { display: inline; }
+.intro-root :is(.hub, .hub-halo, .lg-glow) { opacity: 0; }
 .intro-root:not(.play) :is(.lg-final, .tx-ar, .tx-line, .tx-en, .tx-sub1, .tx-sub2) { opacity: 0; }
-.intro-root .lg-glow { opacity: 0; }
-.intro-root.play .lg-final { animation: lg-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-.intro-root.play .lg-glow { animation: lg-glow 1.2s ease-out 0.15s both; }
-.intro-root.play .tx-ar { animation: tx-wipe 0.6s cubic-bezier(0.65, 0.05, 0.3, 1) 0.3s both; }
-.intro-root.play .tx-line { transform-origin: center; animation: tx-line 0.5s cubic-bezier(0.65, 0.05, 0.3, 1) 0.65s both; }
-.intro-root.play .tx-en { animation: tx-track 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.75s both; }
-.intro-root.play .tx-sub1 { animation: tx-up 0.45s ease 1.1s both; }
-.intro-root.play .tx-sub2 { animation: tx-up 0.45s ease 1.25s both; }
-.intro-root { transition: opacity 0.4s ease, transform 0.4s ease; }
-.intro-root.leaving { opacity: 0; transform: scale(0.98); }
+.intro-root.play .gr path { fill: none; stroke-linecap: round; stroke-linejoin: round; animation-name: gr-draw; animation-timing-function: linear; animation-fill-mode: both; }
+.intro-root.play .gr-body { stroke-width: 13; animation: fade-out 0.5s ease 3.5s both; }
+.intro-root.play .gr-lead { stroke-width: 3.5; animation: fade-out 0.7s ease 3.25s both; }
+.intro-root.play .lg-final { opacity: 0; animation: fade-in 0.6s ease 3.05s both; }
+.intro-root.play .hub { transform-box: fill-box; transform-origin: center; animation: hub-in 0.6s cubic-bezier(0.3, 1.4, 0.5, 1) 0.05s both, fade-out 0.5s ease 3.3s forwards; }
+.intro-root.play .hub-halo { transform-box: fill-box; transform-origin: center; animation: hub-halo 1.1s ease-out 0.2s both; }
+.intro-root.play .lg-wrap { animation: lg-pop 0.9s ease 3.35s both; }
+.intro-root.play .lg-glow { animation: lg-glow 1.4s ease-out 3.3s both; }
+.intro-root.play .tx-ar { animation: tx-wipe 1s cubic-bezier(0.65, 0.05, 0.3, 1) 3.9s both; }
+.intro-root.play .tx-line { transform-origin: center; animation: tx-line 0.8s cubic-bezier(0.65, 0.05, 0.3, 1) 4.5s both; }
+.intro-root.play .tx-en { animation: tx-track 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 4.7s both; }
+.intro-root.play .tx-sub1 { animation: tx-up 0.7s ease 5.3s both; }
+.intro-root.play .tx-sub2 { animation: tx-up 0.7s ease 5.5s both; }
+.intro-root { transition: opacity 0.7s ease, transform 0.7s ease; }
+.intro-root.leaving { opacity: 0; transform: scale(0.97); }
 @media (prefers-reduced-motion: reduce) {
-  .intro-root.play :is(.lg-final, .lg-glow, .tx-ar, .tx-line, .tx-en, .tx-sub1, .tx-sub2) { animation-duration: 0.01s !important; animation-delay: 0s !important; }
+  .intro-root .gr, .intro-root :is(.hub, .hub-halo) { display: none !important; }
+  .intro-root.play :is(.lg-final, .lg-wrap, .lg-glow, .tx-ar, .tx-line, .tx-en, .tx-sub1, .tx-sub2) { animation-duration: 0.01s !important; animation-delay: 0s !important; }
+}
+
+/* ── Vacuum Distillation Unit: sticky scroll scene (design/Technology.dc.html) ── */
+.vdu { position: relative; height: 900vh; background: #141c24; color: #f2f4f6; }
+@media (max-width: 760px) { .vdu { height: 760vh; } }
+.vdu-stage{position:sticky;top:0;height:100vh;width:100%;overflow:hidden;background:#141C24}
+.vdu-gl,.vdu-fallback{position:absolute;inset:0;width:100%;height:100%;display:block}
+.vdu-fallback{display:none}
+.vdu.no-webgl .vdu-gl{display:none}.vdu.no-webgl .vdu-fallback{display:block}
+.vdu-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(16,24,32,.82) 0%,rgba(16,24,32,.4) 34%,rgba(16,24,32,0) 58%),linear-gradient(0deg,rgba(16,24,32,.6) 0%,rgba(16,24,32,0) 30%)}
+.vdu-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 180px rgba(0,0,0,.6)}
+.vdu-panel{position:absolute;left:40px;bottom:72px;width:min(470px,calc(100% - 80px));display:flex;flex-direction:column;gap:12px;opacity:0;visibility:hidden;will-change:opacity,transform;font-family:inherit}
+.vdu-panel h3{margin:0;font-size:clamp(24px,3.6vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.02em;color:#F2F4F6;text-wrap:balance}
+.vdu-panel p{margin:0;font-size:16px;line-height:1.7;color:#D3D9DF;max-width:46ch}
+.vdu-hero{bottom:auto;top:max(18vh,110px)}
+.vdu-h1{margin:0;font-size:clamp(34px,8.6vw,96px);line-height:.95;font-weight:800;letter-spacing:-.035em;text-transform:uppercase;color:#F2F4F6}
+.vdu-h1 span{display:block;color:transparent;-webkit-text-stroke:1.5px rgba(242,244,246,.85)}
+[dir="rtl"] .vdu-h1{letter-spacing:0;line-height:1.2}
+.vdu-legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#C3CAD3}
+.vdu-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:8px;vertical-align:0}
+.vdu-prod{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 14px}
+.vdu-prod .code{font-size:clamp(36px,5.6vw,68px);line-height:1;font-weight:800;letter-spacing:-.03em}
+.vdu-prod .name{font-size:14px;font-weight:600;color:#C3CAD3}
+.vdu-note{font-size:13px;line-height:1.6;color:#A9B2BD;border-inline-start:2px solid rgba(255,255,255,.18);padding-inline-start:10px}
+.vdu-rail{position:absolute;right:28px;top:50%;transform:translateY(-50%);height:min(56vh,440px);width:2px;background:rgba(255,255,255,.16)}
+.vdu-rail-fill{position:absolute;inset:0;background:linear-gradient(#E07B2A,#F2B544);transform-origin:top;transform:scaleY(0)}
+.vdu .rail-dot{position:absolute;left:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:0;background:transparent;cursor:pointer;padding:0}
+.vdu .rail-dot::after{content:"";position:absolute;inset:7px;border-radius:50%;background:#141C24;border:1.5px solid rgba(255,255,255,.45);transition:background .3s,border-color .3s}
+.vdu .rail-dot.on::after{background:#E07B2A;border-color:#E07B2A}
+.vdu .rail-dot:focus-visible{outline:2px solid #F2B544;outline-offset:2px}
+.vdu-hint{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#A9B2BD}
+.vdu-hint i{width:1px;height:38px;background:linear-gradient(#F2F4F6,transparent);animation:vduhint 1.8s ease-in-out infinite}
+@keyframes vduhint{0%{transform:scaleY(.2);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}100%{transform:scaleY(.2);transform-origin:bottom}}
+.vdu-foot{position:absolute;right:28px;bottom:18px;font-size:11px;color:rgba(169,178,189,.8)}
+.vdu .tag{padding:0;background:none;border-radius:0;align-self:auto;color:inherit;font-size:inherit;position:absolute;left:0;top:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;opacity:0;visibility:hidden;z-index:2}
+.vdu .tag span{padding:6px 11px;border-radius:999px;background:rgba(16,24,32,.8);border:1px solid rgba(255,255,255,.14);font-size:12px;font-weight:600;color:#F2F4F6;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.vdu .tag span::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.vdu .tag i{width:1px;height:20px;background:linear-gradient(var(--c),transparent)}
+.vdu .tag.mini{--c:#E8EDF2;z-index:1}
+.vdu .tag.mini span{padding:3px 9px;font-size:11px;font-weight:500;background:rgba(16,24,32,.72)}
+.vdu .tag.mini span::before{width:5px;height:5px}
+.vdu .tag.mini i{height:14px;background:linear-gradient(rgba(232,237,242,.8),transparent)}
+@media (max-width:760px){.vdu-scrim{background:linear-gradient(0deg,rgba(16,24,32,.88) 0%,rgba(16,24,32,.45) 42%,rgba(16,24,32,0) 70%)}.vdu-panel{left:20px;width:calc(100% - 40px);bottom:44px}.vdu-panel p{font-size:14px}.vdu-rail,.vdu-foot{display:none}.vdu .tag span{font-size:11px;padding:4px 8px}}
+@media (prefers-reduced-motion: reduce){.vdu-hint i{animation:none}}
+.vdu-prod a{text-decoration:none}.vdu-prod a.name{color:#C3CAD3}.vdu-prod a:hover{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:2px}
+.vdu-more{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid var(--c);color:#F2F4F6;font-size:13px;font-weight:600;text-decoration:none;background:rgba(16,24,32,.55);transition:background .2s}
+.vdu-more::after{content:"→";color:var(--c)}[dir="rtl"] .vdu-more::after{content:"←"}
+.vdu-more:hover{background:rgba(255,255,255,.08)}
+.vdu-prods{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.vdu-prods strong{font-size:13px;font-weight:600;color:#C3CAD3;margin-inline-end:4px}
+.vdu-prods a{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.18);color:#F2F4F6;font-size:13px;font-weight:600;text-decoration:none;background:rgba(16,24,32,.55)}
+.vdu-prods a::before{content:"";width:8px;height:10px;border-radius:2px;background:var(--c)}
+.vdu-prods a:hover{border-color:var(--c)}
+.vdu a:focus-visible{outline:2px solid #F2B544;outline-offset:3px}
+.vdu a.tag-link{pointer-events:auto;text-decoration:none;cursor:pointer}
+.vdu a.tag-link span{border-color:var(--c)}.vdu a.tag-link b{color:var(--c);font-weight:700}
+.vdu a.tag-link.alt i{height:52px}
+.vdu a.tag-link::after{content:"";position:absolute;top:100%;left:50%;width:58px;height:64px;transform:translateX(-50%)}
+.vdu a.tag-link:hover span{background:rgba(30,42,54,.95)}
+.vdu-panel h3, .vdu-h1 { font-family: inherit; }
+.vdu-stage { height: 100svh; }
+.vdu-foot { right: 104px; }
+@media (max-width: 760px) {
+  html.vdu-in-view .barrel { opacity: 0; pointer-events: none; transform: translateY(12px); }
+  .vdu .tag-link { display: none !important; }
+}
+@media (max-width: 760px) {
+  .vdu-hero { top: max(14vh, 96px); }
+  .vdu-panel { gap: 10px; }
+  .vdu-panel p { line-height: 1.6; }
+  .vdu-legend { font-size: 12px; gap: 6px 12px; }
+}
+@media (max-width: 380px) {
+  .vdu-panel { bottom: 28px; }
+  .vdu-panel p { font-size: 13.5px; }
+  .vdu-prods a { padding: 5px 10px; font-size: 12px; }
+}
+/* Scripts unavailable: show the chapters as a plain stacked article list. */
+.vdu.vdu-static { height: auto; }
+.vdu-static .vdu-stage { position: relative; height: auto; display: flex; flex-direction: column; gap: 40px; padding: 96px 20px; }
+.vdu-static :is(.vdu-panel, .vdu-hero) { position: static; opacity: 1; visibility: visible; width: auto; max-width: 640px; margin-inline: auto; }
+.vdu-static :is(.vdu-gl, .vdu-fallback, .vdu-rail, .vdu-hint, .vdu-scrim, .tag) { display: none; }
+.vdu-static .vdu-foot { position: static; text-align: center; }
+
+/* ── Menu button: liquid fuel-bar hamburger (<OilBurger>) ─────────────── */
+.ob { display: block; overflow: visible; }
+.ob .ob-fill { fill: var(--color-primary); transition: fill 0.35s ease; }
+button:focus-visible > .ob .ob-fill { fill: var(--color-accent); }
+@media (hover: hover) { button:hover > .ob .ob-fill { fill: var(--color-accent); } } /* no "stuck" gold after a tap on touch screens */
+.ob .ob-bar { transform-box: view-box; }
+.ob .ob-top { transform-origin: 12px 6px; }
+.ob .ob-mid { transform-origin: 12px 12px; }
+.ob .ob-bot { transform-origin: 12px 18px; }
+/* Closing: un-rotate first, then the bars flow back apart; the middle one regrows from the centre. */
+.ob :is(.ob-top, .ob-bot) {
+  transition: rotate 0.24s cubic-bezier(0.4, 0, 0.2, 1), translate 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.18s;
+}
+.ob .ob-mid { transition: scale 0.34s cubic-bezier(0.2, 0.8, 0.2, 1) 0.26s, opacity 0.2s ease 0.26s; }
+/* Opening: the outer bars pour into the centre, then twist into an X (fused by the goo filter). */
+.ob[data-open] :is(.ob-top, .ob-bot) {
+  transition: translate 0.24s cubic-bezier(0.5, 0, 0.3, 1), rotate 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.17s;
+}
+.ob[data-open] .ob-top { translate: 0 6px; rotate: 45deg; }
+.ob[data-open] .ob-bot { translate: 0 -6px; rotate: -45deg; }
+.ob[data-open] .ob-mid { scale: 0 1; opacity: 0; transition: scale 0.22s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.15s ease 0.12s; }
+/* The middle bar's last drop hangs, then falls away. */
+.ob .ob-drop { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.ob[data-open] .ob-drop { animation: ob-drip 0.8s ease-in 0.32s both; }
+@keyframes ob-drip {
+  0% { opacity: 1; translate: 0 0; scale: 0.5; }
+  35% { opacity: 1; translate: 0 3px; scale: 1; }
+  75% { opacity: 1; translate: 0 7.5px; scale: 0.8 1.2; }
+  100% { opacity: 0; translate: 0 10px; scale: 0.4 1.1; }
+}
+/* Occasional highlight sweep along each bar's top edge. */
+.ob .ob-sheen { stroke-dasharray: 3 40; stroke-dashoffset: 3; opacity: 0.9; animation: ob-sheen 5s ease-in-out infinite; }
+.ob .ob-mid .ob-sheen { animation-delay: 0.12s; }
+.ob .ob-bot .ob-sheen { animation-delay: 0.24s; }
+.ob[data-open] .ob-sheen { animation: none; opacity: 0; }
+@keyframes ob-sheen {
+  0%, 62% { stroke-dashoffset: 3; }
+  96%, 100% { stroke-dashoffset: -16; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ob .ob-sheen, .ob .ob-drop { display: none; }
 }

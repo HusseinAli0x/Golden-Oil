@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ClipboardCheck, FlaskConical, HeartPulse, Leaf, ShieldCheck, type LucideIcon } from "lucide-react";
-import { ContactBand } from "@/components/ui/ContactBand";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 import { getDictionary, isLocale, localePath } from "@/lib/i18n";
@@ -19,8 +18,8 @@ export default async function QualityPage({ params }: PageProps<"/[lang]/quality
   const t = dict.quality;
 
   const cards: ReadonlyArray<{ item: { title: string; text: string; items: readonly string[] }; icon: LucideIcon; span: string; pending: boolean }> = [
-    { item: t.qm, icon: ClipboardCheck, span: "s2", pending: true },
-    { item: t.pq, icon: FlaskConical, span: "s2", pending: true },
+    { item: t.qm, icon: ClipboardCheck, span: "s2", pending: false },
+    { item: t.pq, icon: FlaskConical, span: "s2", pending: false },
     { item: t.hs, icon: HeartPulse, span: "s2 r2", pending: false },
     { item: t.env, icon: Leaf, span: "s2", pending: false },
     { item: t.os, icon: ShieldCheck, span: "s2", pending: false },
@@ -55,7 +54,7 @@ export default async function QualityPage({ params }: PageProps<"/[lang]/quality
       <Section id="sus" titleId="sus-title" className="pt-10">
         <div className="card reveal flex flex-wrap items-center justify-between gap-5 p-8">
           <div className="flex max-w-[640px] flex-col gap-2">
-            <h2 id="sus-title" className="m-0 text-[26px] font-bold">
+            <h2 id="sus-title" className="m-0 text-[clamp(22px,1vw+19px,26px)] font-bold">
               {t.susT}
             </h2>
             <p className="m-0 text-[15px] leading-[1.7] text-muted">{t.susP}</p>
@@ -67,7 +66,7 @@ export default async function QualityPage({ params }: PageProps<"/[lang]/quality
         <p className="m-0 text-sm leading-relaxed text-subtle">{t.claimNote}</p>
       </Section>
 
-      <ContactBand common={dict.common} locale={lang} />
+      <div aria-hidden className="pb-[88px] min-[900px]:pb-[110px]" />
     </>
   );
 }

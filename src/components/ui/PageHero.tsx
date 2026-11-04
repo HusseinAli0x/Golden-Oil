@@ -40,7 +40,7 @@ export function PageHero({ locale, common, crumb, title, lead }: PageHeroProps) 
         <h1 id="page-title" className="h1 max-w-[880px]">
           {title}
         </h1>
-        <p className="m-0 max-w-[680px] text-lg leading-[1.7] text-muted">{lead}</p>
+        <p className="m-0 max-w-[680px] text-lead text-muted">{lead}</p>
       </div>
     </section>
   );

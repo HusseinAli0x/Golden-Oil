@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowDown, Droplets, Flame, Recycle, ShieldAlert, Waves, type LucideIcon } from "lucide-react";
-import { ContactBand } from "@/components/ui/ContactBand";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 import { getDictionary, isLocale } from "@/lib/i18n";
@@ -31,7 +30,7 @@ export default async function SustainabilityPage({ params }: PageProps<"/[lang]/
             <Image src="/images/heat-exchangers.jpg" alt={t.hr.imgAlt} fill sizes="(min-width: 1240px) 700px, (min-width: 900px) 52vw, 100vw" className="object-cover object-[62%_58%]" quality={90} />
           </div>
           <div className="flex flex-col justify-center gap-6 p-7 min-[900px]:p-11">
-            <h2 id="hr-title" className="m-0 text-[30px] font-bold leading-tight text-white min-[900px]:text-[36px]">
+            <h2 id="hr-title" className="m-0 text-[clamp(26px,1.6vw+20px,36px)] font-bold leading-tight text-white">
               {t.hr.title}
             </h2>
             <p className="m-0 text-base leading-[1.8] text-border-strong">{t.hr.text}</p>
@@ -59,7 +58,7 @@ export default async function SustainabilityPage({ params }: PageProps<"/[lang]/
                 <div className="ico">
                   <Icon size={26} strokeWidth={1.6} aria-hidden />
                 </div>
-                <h2 className="m-0 text-[22px] font-bold">{item.title}</h2>
+                <h2 className="m-0 text-title font-bold">{item.title}</h2>
                 <p className="m-0 text-[15px] leading-[1.75] text-muted">{item.text}</p>
               </li>
             );
@@ -68,7 +67,7 @@ export default async function SustainabilityPage({ params }: PageProps<"/[lang]/
         <p className="m-0 text-sm leading-relaxed text-subtle">{t.claimNote}</p>
       </Section>
 
-      <ContactBand common={dict.common} locale={lang} />
+      <div aria-hidden className="pb-[88px] min-[900px]:pb-[110px]" />
     </>
   );
 }

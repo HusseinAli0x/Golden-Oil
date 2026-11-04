@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Cylinder, Droplets, Fan, Heater, ShieldCheck, Waves, Wind, type LucideIcon } from "lucide-react";
-import { ContactBand } from "@/components/ui/ContactBand";
 import { CtaBand } from "@/components/ui/CtaBand";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -58,7 +57,7 @@ export default async function FacilitiesPage({ params }: PageProps<"/[lang]/faci
                   <Image src={image} alt={t.imgAlts[key]} fill quality={90} sizes="(min-width: 1080px) 1240px, (min-width: 600px) 100vw, 100vw" className={`object-cover ${IMG_EASE}`} />
                 </div>
                 <div className="flex flex-col gap-2.5 p-6">
-                  <h2 className="m-0 text-[22px] font-bold">{item.title}</h2>
+                  <h2 className="m-0 text-title font-bold">{item.title}</h2>
                   <p className="m-0 text-[15px] leading-[1.7] text-muted">{item.text}</p>
                   <p className="m-0 text-[13px] leading-relaxed">
                     <b className="text-accent-text">{t.roleL}</b> {item.role}
@@ -110,7 +109,7 @@ export default async function FacilitiesPage({ params }: PageProps<"/[lang]/faci
         </CtaBand>
       </Section>
 
-      <ContactBand common={dict.common} locale={lang} />
+      <div aria-hidden className="pb-[88px] min-[900px]:pb-[110px]" />
     </>
   );
 }

@@ -49,12 +49,12 @@ export function ProductShowcase({ t, common }: ProductShowcaseProps) {
                     className={`object-cover transition-transform duration-700 ${EASE} group-hover:scale-[1.06]`}
                   />
                   <span aria-hidden className="absolute inset-0 bg-[linear-gradient(0deg,rgb(15_57_73/0.55)_0%,transparent_55%)]" />
-                  <span dir="ltr" className="absolute bottom-5 start-6 text-[44px] font-bold leading-none text-white min-[900px]:text-[52px]">
+                  <span dir="ltr" className="absolute bottom-5 start-6 text-[clamp(36px,2.4vw+28px,52px)] font-bold leading-none text-white">
                     {it.code}
                   </span>
                 </span>
                 <span className="flex flex-1 flex-col gap-3 px-7 pb-7 pt-6">
-                  <span className="text-[22px] font-semibold leading-snug">{it.name}</span>
+                  <span className="text-title font-semibold leading-snug">{it.name}</span>
                   <span className="text-base leading-[1.7] text-ink-soft">{it.intro}</span>
                   {p.gradeImages && (
                     <span className="flex flex-wrap gap-2.5" dir="ltr">
@@ -101,12 +101,12 @@ export function ProductShowcase({ t, common }: ProductShowcaseProps) {
               </button>
               <div className="flex min-w-0 flex-[1_1_480px] flex-col gap-5 px-6 pb-8 pt-8 min-[900px]:px-12 min-[900px]:pb-12 min-[900px]:pt-14">
                 <h2 id="pm-title" className="m-0 flex flex-col gap-1.5">
-                  <span dir="ltr" className="text-[44px] font-bold leading-none text-primary min-[900px]:text-[56px]">
+                  <span dir="ltr" className="text-[clamp(36px,3vw+26px,56px)] font-bold leading-none text-primary">
                     {item.code}
                   </span>
                   {item.name !== item.code && <span className="text-xl font-semibold text-ink-soft">{item.name}</span>}
                 </h2>
-                <p className="m-0 text-lg leading-[1.8] text-ink-soft">{item.intro}</p>
+                <p className="m-0 text-lead text-ink-soft">{item.intro}</p>
                 <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 border-y border-border py-5 text-base leading-relaxed">
                   <dt className="font-semibold text-muted">{t.originL}</dt>
                   <dd className="m-0 text-ink">{item.origin}</dd>
@@ -134,7 +134,7 @@ export function ProductShowcase({ t, common }: ProductShowcaseProps) {
                       >
                         <Image src={meta.gradeImages![gi]} alt={g.alt} fill sizes="(min-width: 1240px) 560px, (min-width: 700px) 50vw, 100vw" className={`object-cover transition-transform duration-700 ${EASE} group-hover:scale-[1.05]`} />
                         <span aria-hidden className="absolute inset-0 bg-[linear-gradient(0deg,rgb(15_57_73/0.7)_0%,transparent_55%)]" />
-                        <span dir="ltr" className="absolute bottom-4 start-5 text-[30px] font-bold leading-none text-white">
+                        <span dir="ltr" className="absolute bottom-4 start-5 text-[clamp(26px,1.2vw+22px,30px)] font-bold leading-none text-white">
                           {g.code}
                         </span>
                       </button>

@@ -74,7 +74,7 @@ export function SiteViewer({ t }: { t: Dictionary["model3d"] }) {
                 type="button"
                 onClick={() => goView(v.id)}
                 aria-pressed={view === v.id}
-                className="min-h-[38px] shrink-0 cursor-pointer whitespace-nowrap rounded-full border border-white/20 bg-dark/80 px-3.5 text-[13px] font-medium text-bg transition-colors hover:border-white/40 focus-visible:outline-amber aria-pressed:border-bg aria-pressed:bg-bg aria-pressed:text-ink"
+                className="min-h-10 shrink-0 cursor-pointer whitespace-nowrap rounded-full border border-white/20 bg-dark/80 px-3.5 text-[13px] font-medium text-bg transition-colors hover:border-white/40 focus-visible:outline-amber aria-pressed:border-bg aria-pressed:bg-bg aria-pressed:text-ink"
               >
                 {t.views[v.id]}
               </button>
