@@ -1,0 +1,522 @@
+{
+  "meta": {
+    "siteName": "Golden Oil Refinery (GOR)",
+    "ogLocale": "en_US",
+    "home": {
+      "title": "Golden Oil Refinery (GOR) | Najaf, Iraq",
+      "description": "Golden Oil Refinery (GOR) in Najaf, Iraq transforms Furnace Oil into VDO, LVGO, HVGO and Bitumen through vacuum distillation, with a stated refining capacity of 17,000 barrels per day."
+    },
+    "about": {
+      "title": "About Us | Golden Oil Refinery (GOR)",
+      "description": "About Golden Oil Refinery (GOR), an industrial refining facility in Najaf, Iraq, part of Al Shabaka Al Thahabiya Trading LLC."
+    },
+    "facilities": {
+      "title": "Facilities | Golden Oil Refinery (GOR)",
+      "description": "The main facilities at Golden Oil Refinery: two Vacuum Distillation Units, feedstock and product storage, heat exchangers, furnace, vacuum system and dispatch."
+    },
+    "products": {
+      "title": "Products | Golden Oil Refinery (GOR)",
+      "description": "Products from Golden Oil Refinery: VDO, LVGO, HVGO and Bitumen (grades 40–50 and 60–70). Contact the refinery for pricing and availability."
+    },
+    "quality": {
+      "title": "Quality & HSE | Golden Oil Refinery (GOR)",
+      "description": "How Golden Oil Refinery approaches product quality, health and safety, environmental responsibility and operational safety."
+    },
+    "sustainability": {
+      "title": "Sustainability | Golden Oil Refinery (GOR)",
+      "description": "Heat recovery, environmental responsibility and resource management at Golden Oil Refinery in Najaf, Iraq."
+    },
+    "siteModel": {
+      "title": "3D Site Model | Golden Oil Refinery (GOR)",
+      "description": "Explore an illustrative interactive 3D model of the Golden Oil Refinery site, with camera views and day and night lighting."
+    },
+    "notFound": {
+      "title": "Page not found | Golden Oil Refinery (GOR)",
+      "description": "The page you are looking for does not exist."
+    },
+    "contact": {
+      "title": "Contact | Golden Oil Refinery (GOR)",
+      "description": "Contact Golden Oil Refinery in Najaf, Iraq to enquire about VDO, LVGO, HVGO and Bitumen, pricing and availability."
+    }
+  },
+  "common": {
+    "skip": "Skip to content",
+    "homeAria": "Golden Oil Refinery, home",
+    "navAria": "Main",
+    "menu": "Menu",
+    "menuClose": "Close menu",
+    "otherLang": "العربية",
+    "langAria": "Switch to Arabic",
+    "nav": {
+      "home": "Home",
+      "about": "About Us",
+      "facilities": "Facilities",
+      "products": "Products",
+      "quality": "Quality & HSE",
+      "sustainability": "Sustainability",
+      "contact": "Contact"
+    },
+    "crumbHome": "Home",
+    "breadcrumbAria": "Breadcrumb",
+    "parentLine": "Golden Oil Refinery (GOR) — part of Al Shabaka Al Thahabiya Trading LLC.",
+    "address": "Haidariya Power Station Street, Karbala–Najaf Road, Lamppost No. 410, Najaf, Iraq.",
+    "gorLogoAlt": "Golden Oil Refinery (GOR) logo",
+    "pending": "Pending approval",
+    "phoneAria": "Call the refinery",
+    "emailAria": "Email the refinery",
+    "backTop": "Back to top",
+    "footer": {
+      "nav": "Footer",
+      "pages": "PAGES",
+      "products": "PRODUCTS",
+      "contact": "CONTACT",
+      "rights": "All rights reserved.",
+      "illus": "Process visuals are illustrative and not to scale."
+    },
+    "contactBand": {
+      "title": "Contact the refinery",
+      "text": "To order or ask about pricing and availability, reach Golden Oil Refinery directly or send an enquiry.",
+      "cta": "Send an enquiry"
+    },
+    "parentIdentity": "Golden Oil Refinery maintains its own identity and operations, while benefiting from the strength of its parent company.",
+    "parentLogosAria": "Golden Oil Refinery and Al Shabaka Al Thahabiya logos",
+    "parentLogoAlt": "Al Shabaka Al Thahabiya logo",
+    "contactBlock": {
+      "title": "Contact the Refinery",
+      "lead": "Reach Golden Oil Refinery directly by phone or email, or find us on the map.",
+      "name": "Golden Oil Refinery (GOR)",
+      "addressL": "Address",
+      "phoneL": "Phone",
+      "emailL": "Email",
+      "companyL": "Company",
+      "company": "Al Shabaka Al Thahabiya Trading LLC",
+      "mapsCta": "Open in Google Maps",
+      "mapsAria": "Open the refinery address in Google Maps (opens in a new tab)",
+      "callCta": "Call now",
+      "emailCta": "Send an email"
+    }
+  },
+  "home": {
+    "heroTitle": "Transforming feedstock into industrial value",
+    "heroSub": "Driven by refining technology and industrial expertise, Golden Oil Refinery transforms heavy feedstock into valuable petroleum products.",
+    "ctaExplore": "Explore our refinery",
+    "ctaProducts": "Our products",
+    "factLocLabel": "Location",
+    "factLoc": "Najaf, Iraq",
+    "factCapLabel": "Stated refining capacity",
+    "factCap": "17,000 barrels per day",
+    "factVduLabel": "Vacuum Distillation Units",
+    "factVdu": "2",
+    "scroll": "Scroll",
+    "scrollAria": "Scroll to the next section",
+    "filmTitle": "Inside Golden Oil Refinery",
+    "filmText": "A short look at the refinery site, its process units and its product storage.",
+    "filmAria": "Golden Oil Refinery film",
+    "procTitle": "From feedstock to refined value",
+    "procSub": "Every stage is part of a carefully managed industrial refining process.",
+    "stages": [
+      {
+        "title": "Feedstock reception",
+        "text": "Furnace Oil, the documented feedstock, is received on site."
+      },
+      {
+        "title": "Storage & handling",
+        "text": "Feedstock is held in storage tanks and moved by transfer pumps."
+      },
+      {
+        "title": "Preheating & heat recovery",
+        "text": "Heat exchangers warm the feed, recovering heat from hot product streams."
+      },
+      {
+        "title": "Controlled heating",
+        "text": "A furnace brings the feed up to temperature before distillation."
+      },
+      {
+        "title": "Vacuum distillation",
+        "text": "Two Vacuum Distillation Units separate the heavy feed under vacuum."
+      },
+      {
+        "title": "Vacuum generation",
+        "text": "Steam ejectors create the vacuum the columns operate under."
+      },
+      {
+        "title": "Product separation",
+        "text": "Separated fractions are drawn off as individual product streams."
+      },
+      {
+        "title": "Storage & dispatch",
+        "text": "Finished products are stored and dispatched to customers."
+      }
+    ],
+    "expTitle": "Explore the refinery in 3D",
+    "expText": "Drag to look around. Use the buttons, pinch, or click the model and scroll to zoom.",
+    "expFull": "Open the full 3D viewer",
+    "prodTitle": "Our product streams",
+    "prodSub": "VDO, LVGO, HVGO and Bitumen — produced from Furnace Oil at our refinery in Najaf.",
+    "aboutTitle": "Who we are",
+    "aboutText": "Golden Oil Refinery (GOR) is an industrial refining facility located in Najaf, Iraq, with a stated refining capacity of 17,000 barrels per day. Two Vacuum Distillation Units process Furnace Oil into VDO, LVGO and HVGO, alongside Bitumen in two grades.",
+    "aboutLink": "About Golden Oil Refinery",
+    "aboutImgAlt": "Entrance sign of Golden Oil Refinery with the refinery units behind it at sunset",
+    "filmAlt": "Golden Oil Refinery site film, playing silently on a loop",
+    "filmPause": "Pause video",
+    "filmPlay": "Play video"
+  },
+  "model3d": {
+    "aria": "3D model of the Golden Oil Refinery site",
+    "label": "Site model · for illustration only",
+    "load": "Load 3D model",
+    "noGl": "The interactive 3D view isn’t available on this device.",
+    "tap": "An interactive 3D model of the Golden Oil Refinery site.",
+    "loading": "Loading 3D model…",
+    "fallbackAlt": "Illustrative render of the Golden Oil Refinery site model",
+    "toolsAria": "3D view controls",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "reset": "Reset view",
+    "auto": "Auto-rotate",
+    "night": "Night lighting",
+    "viewsAria": "Camera views",
+    "views": {
+      "overview": "Overview",
+      "columns": "Process area",
+      "tanks": "Tank farm",
+      "air": "Instrument air",
+      "fire": "Fire water",
+      "flare": "Flare"
+    },
+    "viewerTitle": "Golden Oil Refinery — 3D site",
+    "viewerSub": "Illustrative model · not to scale",
+    "help": {
+      "rotate": "Rotate",
+      "rotateHow": "left-drag · one finger",
+      "pan": "Pan",
+      "panHow": "right-drag · Shift + drag · two fingers",
+      "zoom": "Zoom",
+      "zoomHow": "scroll wheel · pinch · + / − buttons",
+      "move": "Move",
+      "moveHow": "arrow keys when the model is focused"
+    },
+    "back": "Back to home"
+  },
+  "products": {
+    "statusDocumented": "Product",
+    "viewDetails": "View details",
+    "close": "Close",
+    "zoom": "View photo full size",
+    "zoomClose": "Close photo",
+    "gradesTitle": "Available grades",
+    "gradesCount": "Two grades",
+    "originL": "Origin",
+    "supplyL": "Supply & specifications",
+    "supplyText": "Contact the refinery for specifications, availability, pricing and delivery.",
+    "order": "To order or ask about pricing, contact the refinery:",
+    "mailSubject": "Product enquiry:",
+    "items": [
+      {
+        "code": "VDO",
+        "name": "Vacuum Distillate Oil",
+        "intro": "Vacuum Distillate Oil — a distillate stream separated under vacuum from Furnace Oil in our vacuum distillation units.",
+        "origin": "Vacuum distillation of Furnace Oil",
+        "alt": "Pipe skid and process equipment at Golden Oil Refinery at night"
+      },
+      {
+        "code": "LVGO",
+        "name": "Light Vacuum Gas Oil",
+        "intro": "Light Vacuum Gas Oil — the lighter gas-oil cut drawn from the vacuum column.",
+        "origin": "Vacuum distillation of Furnace Oil",
+        "alt": "Heat exchangers and process structures at Golden Oil Refinery"
+      },
+      {
+        "code": "HVGO",
+        "name": "Heavy Vacuum Gas Oil",
+        "intro": "Heavy Vacuum Gas Oil — the heavier gas-oil cut drawn from the vacuum column.",
+        "origin": "Vacuum distillation of Furnace Oil",
+        "alt": "Aerial view of process units at Golden Oil Refinery at night"
+      },
+      {
+        "code": "Bitumen",
+        "name": "Bitumen",
+        "intro": "Bitumen from Golden Oil Refinery, available in two grades: Bitumen 40–50 and Bitumen 60–70.",
+        "origin": "Produced at Golden Oil Refinery, Najaf",
+        "alt": "Bitumen drums being filled from the filling line at Golden Oil Refinery at sunset"
+      }
+    ],
+    "grades": [
+      {
+        "code": "Bitumen 40–50",
+        "name": "Grade 40–50",
+        "alt": "Aerial view of bitumen drums arranged in the Golden Oil Refinery yard"
+      },
+      {
+        "code": "Bitumen 60–70",
+        "name": "Grade 60–70",
+        "alt": "Bitumen drums being moved by a loader at Golden Oil Refinery"
+      }
+    ]
+  },
+  "about": {
+    "crumb": "About Us",
+    "title": "An industrial refinery in Najaf, Iraq",
+    "lead": "Who we are, what we refine, and the group we belong to.",
+    "whoTi": "Golden Oil Refinery (GOR)",
+    "whoText": "Golden Oil Refinery (GOR) is an industrial refining facility located in Najaf, Iraq, with a stated refining capacity of 17,000 barrels per day.",
+    "whoText2": "Two Vacuum Distillation Units process Furnace Oil, the documented feedstock. Our products are VDO, LVGO, HVGO and Bitumen.",
+    "posterAlt": "Product storage tanks and pipelines at Golden Oil Refinery",
+    "fLocL": "Location",
+    "fLoc": "Najaf, Iraq",
+    "fCapL": "Stated refining capacity",
+    "fCap": "17,000 bbl/day",
+    "fVduL": "Vacuum Distillation Units",
+    "fVdu": "2",
+    "fFeedL": "Documented feedstock",
+    "fFeed": "Furnace Oil",
+    "fProdL": "Main documented products",
+    "fProdNote": "Bitumen is supplied in two grades: 40–50 and 60–70.",
+    "fEstL": "Established",
+    "fEst": "2024",
+    "parTi": "Part of Al Shabaka Al Thahabiya Trading LLC",
+    "valTi": "Vision, mission, values and commitment",
+    "valLead": "",
+    "values": [
+      {
+        "title": "Vision",
+        "text": "To achieve operational excellence, strengthen our environmental responsibility, and build positive, sustainable relationships with the community.",
+        "list": []
+      },
+      {
+        "title": "Mission",
+        "text": "To provide high-quality refined petroleum products that meet the growing energy needs of our region and other markets, while ensuring the safety and well-being of our employees, partners, and the communities we serve.",
+        "list": []
+      },
+      {
+        "title": "Our Values",
+        "text": "",
+        "list": [
+          "Operational Excellence",
+          "Safety & Responsibility",
+          "Quality & Reliability",
+          "Environmental Responsibility",
+          "Innovation & Development",
+          "Collaboration & Partnership",
+          "Sustainability"
+        ]
+      },
+      {
+        "title": "Our Commitment",
+        "text": "We are committed to providing high-quality petroleum products, strengthening operational excellence, and safeguarding the safety of our employees, partners, and surrounding communities. We also strive to reduce the environmental impact of our operations, develop our capabilities, and strengthen cooperation with local communities, government entities, and industrial partners.",
+        "list": []
+      }
+    ]
+  },
+  "facilities": {
+    "crumb": "Facilities",
+    "title": "The units behind every barrel",
+    "lead": "The main facilities that take Furnace Oil from reception to finished, dispatched product.",
+    "roleL": "Role in the process:",
+    "items": {
+      "vdu": {
+        "title": "Two Vacuum Distillation Units",
+        "text": "The heart of the refinery. Both units separate the heavy feed into fractions under vacuum.",
+        "role": "Separation of Furnace Oil into product streams."
+      },
+      "feed": {
+        "title": "Feedstock storage tanks",
+        "text": "Tanks that receive and hold Furnace Oil before processing.",
+        "role": "Steady, managed feed supply to the process units."
+      },
+      "hx": {
+        "title": "Heat exchangers",
+        "text": "Exchangers that warm incoming feed using heat recovered from hot product streams.",
+        "role": "Preheating and heat recovery."
+      },
+      "furnace": {
+        "title": "Furnace",
+        "text": "A fired heater that brings the feed up to temperature before distillation.",
+        "role": "Controlled heating ahead of vacuum distillation."
+      },
+      "vacuum": {
+        "title": "Vacuum system & steam ejectors",
+        "text": "Steam ejectors create the vacuum the distillation columns operate under.",
+        "role": "Vacuum generation."
+      },
+      "storage": {
+        "title": "Product storage",
+        "text": "Tanks that hold finished products ahead of dispatch.",
+        "role": "Storage of finished product streams."
+      },
+      "dispatch": {
+        "title": "Loading & dispatch",
+        "text": "The area that handles transfer of feedstock in and finished products out.",
+        "role": "Receipt of feedstock and delivery of products."
+      }
+    },
+    "supportTi": "Supporting systems",
+    "supportLead": "Utilities and safety systems that keep the process units running.",
+    "support": [
+      "Cooling towers",
+      "Boilers",
+      "Nitrogen package",
+      "Water treatment",
+      "Sour water system",
+      "Fire-fighting system",
+      "Emissions controls"
+    ],
+    "tourT": "Explore the site in 3D",
+    "tourP": "See how the facilities sit together on our interactive site model.",
+    "tourBtn": "Open the 3D model",
+    "imgAlts": {
+      "vdu": "Vacuum distillation columns at Golden Oil Refinery lit at night",
+      "feed": "Storage tanks at Golden Oil Refinery at sunset",
+      "hx": "Horizontal heat exchangers at Golden Oil Refinery",
+      "furnace": "Pipework around the furnace area at Golden Oil Refinery at night",
+      "vacuum": "Process pipe racks at Golden Oil Refinery at night",
+      "storage": "Petroleum product storage tanks and pipelines at Golden Oil Refinery",
+      "dispatch": "Numbered loading platform at Golden Oil Refinery at dusk"
+    },
+    "supportCardsTi": "On-site support systems",
+    "supportCards": [
+      {
+        "title": "Fire water pumps",
+        "text": "Dedicated pump shelter serving the site's fire-fighting system.",
+        "alt": "Fire water pumps shelter at Golden Oil Refinery"
+      },
+      {
+        "title": "Instrument air unit",
+        "text": "Compressed air package that supplies the site's instrument air.",
+        "alt": "Instrument air unit at Golden Oil Refinery at night"
+      },
+      {
+        "title": "Tanker dispatch",
+        "text": "Product leaves the site by road tanker from the loading area.",
+        "alt": "Road tanker at the Golden Oil Refinery loading area at dusk"
+      }
+    ]
+  },
+  "productsPage": {
+    "crumb": "Products",
+    "title": "Our products",
+    "lead": "VDO, LVGO, HVGO and Bitumen. Contact us for pricing and availability.",
+    "details": "Product details",
+    "photoNote": "Photos show the refinery site and operations, not laboratory samples.",
+    "gradeL": "Grades"
+  },
+  "quality": {
+    "crumb": "Quality & HSE",
+    "title": "Safety, quality and responsibility",
+    "lead": "How Golden Oil Refinery approaches product quality, people’s safety and the environment.",
+    "qm": {
+      "title": "Quality management",
+      "text": "[Quality management approach — to be provided by GOR]",
+      "items": []
+    },
+    "pq": {
+      "title": "Product quality",
+      "text": "[Product quality and testing approach — to be provided by GOR]",
+      "items": []
+    },
+    "hs": {
+      "title": "Health & safety",
+      "text": "The refinery follows safety protocols designed to protect people on site.",
+      "items": [
+        "Regular drills and training",
+        "Maintenance of safety equipment",
+        "An extensive fire-fighting system across the site"
+      ]
+    },
+    "env": {
+      "title": "Environmental responsibility",
+      "text": "Systems on site are designed to limit the refinery’s environmental impact.",
+      "items": [
+        "Water treatment for process and site water",
+        "A sour water system that treats water containing hydrogen sulphide and ammonia",
+        "Emissions control technologies"
+      ]
+    },
+    "os": {
+      "title": "Operational safety",
+      "text": "Supporting systems help the plant run safely and reliably.",
+      "items": [
+        "Nitrogen package for purging, blanketing and inerting",
+        "Emergency shutdown mechanisms",
+        "Boilers and cooling towers supporting stable operation"
+      ]
+    },
+    "susT": "Sustainability",
+    "susP": "Heat recovery, environmental responsibility and how we manage resources.",
+    "susBtn": "Read about sustainability",
+    "claimNote": "No certifications, accreditations, compliance standards or safety statistics are claimed here. They will be added only when documented and approved."
+  },
+  "sustainability": {
+    "crumb": "Sustainability",
+    "title": "Refining with responsibility",
+    "lead": "How the refinery manages water, gases, heat and spills across the site.",
+    "hr": {
+      "title": "Heat recovery",
+      "text": "Hot product streams pass their heat to the incoming feed through heat exchangers. The feed arrives at the furnace already preheated, which reduces the heating load on the furnace.",
+      "imgAlt": "Horizontal heat exchangers at Golden Oil Refinery",
+      "steps": [
+        "Hot product streams",
+        "Heat exchangers",
+        "Preheated feed to the furnace"
+      ]
+    },
+    "claimNote": "No emissions reductions, energy-saving figures, carbon claims or environmental certifications are stated. They will be added only when documented and approved.",
+    "items": [
+      {
+        "title": "Water treatment",
+        "text": "Process and site water is treated on site. A dedicated sour water system handles water containing hydrogen sulphide and ammonia, with reverse osmosis and EDI where relevant."
+      },
+      {
+        "title": "Flare system",
+        "text": "Excess gases are routed to a flare so they can be handled safely."
+      },
+      {
+        "title": "Cooling water recirculation",
+        "text": "Cooling water is recirculated through the cooling towers rather than used once."
+      },
+      {
+        "title": "Spill prevention",
+        "text": "Secondary containment is designed to hold spills and keep them from reaching the wider site."
+      },
+      {
+        "title": "Oil–water separation",
+        "text": "Oil is separated from water and recovered instead of being lost to the drain."
+      }
+    ]
+  },
+  "notFound": {
+    "big": "404",
+    "title": "We drilled here, but found nothing.",
+    "text": "The page you’re looking for doesn’t exist or has been moved. Let’s get you back on track.",
+    "home": "Back to home",
+    "art": "An oil pump jack pumping an empty well"
+  },
+  "loading": {
+    "brand": "Golden Oil Refinery",
+    "label": "Loading"
+  },
+  "contact": {
+    "crumb": "Contact",
+    "title": "Contact the refinery",
+    "lead": "Tell us what you need and the refinery will get back to you directly.",
+    "infoTi": "Direct contact",
+    "phoneL": "Phone",
+    "emailL": "Email",
+    "addressL": "Address",
+    "imgAlt": "A road tanker at the Golden Oil Refinery loading area at dusk",
+    "formTi": "Send an enquiry",
+    "company": "Company name",
+    "person": "Contact person",
+    "product": "Product of interest",
+    "productPh": "Select a product",
+    "quantity": "Required quantity",
+    "delivery": "Delivery location",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
+    "send": "Send enquiry",
+    "note": "Sending opens your email app with the enquiry filled in.",
+    "required": "required",
+    "other": "Other / not sure yet"
+  }
+}
