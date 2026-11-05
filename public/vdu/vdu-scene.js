@@ -238,6 +238,37 @@ window.GORVDU = function (opts) {
     g.fillStyle = gr; g.fillRect(0, 0, w, h);
   });
 
+  // ---------- Reflection environment (PBR metals: drums, vessels) ----------
+  // A tiny procedural sky/horizon with warm key and cool rim panels matching the scene lights,
+  // prefiltered once with PMREM. Applied only to the product drums and the bitumen unit.
+  const envTex = (() => {
+    const pm = new T.PMREMGenerator(renderer);
+    const es = new T.Scene();
+    const sky = new T.SphereGeometry(50, 24, 12);
+    const cGround = new T.Color(0x30343a), cHorizon = new T.Color(0x56657a), cSky = new T.Color(0x222d3b);
+    const pos = sky.attributes.position, cols = [];
+    for (let i = 0; i < pos.count; i++) {
+      const y = pos.getY(i) / 50;
+      const c = y < 0 ? cHorizon.clone().lerp(cGround, Math.min(1, -y * 2.5)) : cHorizon.clone().lerp(cSky, Math.min(1, y * 2.2));
+      cols.push(c.r, c.g, c.b);
+    }
+    sky.setAttribute('color', new T.Float32BufferAttribute(cols, 3));
+    es.add(new T.Mesh(sky, new T.MeshBasicMaterial({ vertexColors: true, side: T.BackSide })));
+    const panel = (color, k, p, w, h) => { const o = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({ color: new T.Color(color).multiplyScalar(k), side: T.DoubleSide })); o.position.set(p[0], p[1], p[2]); o.lookAt(0, 0, 0); es.add(o); };
+    panel(0xffd6a0, 5, [22, 34, 18], 18, 10);   // key (matches the warm directional light)
+    panel(0x7fa6ff, 2.2, [-26, 20, -22], 14, 8); // rim
+    panel(0xe8eef5, 1.2, [0, 12, 40], 40, 3);    // soft horizon strip
+    // tall low strips: vertical highlight streaks on the drums/vessels from the yard camera angles
+    panel(0xffe2bc, 6, [32, 6, 32], 9, 50);
+    panel(0xa9c2ff, 3, [-30, 6, 32], 8, 46);
+    panel(0xdfe6ee, 2.2, [4, -2, 46], 10, 46);
+    const tex = pm.fromScene(es, 0.03).texture;
+    es.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+    pm.dispose();
+    return tex;
+  })();
+  cleanup.push(() => envTex.dispose());
+
   // ---------- Materials ----------
   const M = (o) => new T.MeshStandardMaterial(o);
   const mat = {
@@ -256,6 +287,7 @@ window.GORVDU = function (opts) {
     cutEdge: M({ color: 0x8c949c, metalness: 0.7, roughness: 0.4 }),
     bg: M({ color: 0x1a2129, metalness: 0.5, roughness: 0.7 }),
     lamp: new T.MeshBasicMaterial({ color: 0xffd8a0 }),
+    motor: M({ color: 0x2f5d8a, metalness: 0.4, roughness: 0.5 }),
   };
   const frontMats = [mat.cladFront];
 
@@ -362,63 +394,173 @@ window.GORVDU = function (opts) {
     }
     return path;
   };
-  const line = (pts, r, color) => {
-    const curve = polyCurve(pts, 1.1);
+  // Flanges are collected here and drawn as one InstancedMesh once every line exists.
+  const FLANGES = [];
+  const flange = (p, d, r) => FLANGES.push({ p: p.clone(), d: d.clone().normalize(), r });
+  // Every line starts and ends at equipment (shell nozzle, tank, barrel, pump or header).
+  // Flanged nozzle connections at both ends, and a flanged joint either side of each elbow.
+  const line = (pts, r, color, bend) => {
+    const curve = polyCurve(pts, bend || 1.1);
     const m = M({ color: 0xc3cad1, metalness: 0.8, roughness: 0.32, emissive: new T.Color(color), emissiveIntensity: 0 });
     const mesh = add(new T.TubeGeometry(curve, Math.max(80, Math.round(curve.getLength() * 3)), r, 16, false), m);
-    // flanges at start
-    const fl = add(new T.CylinderGeometry(r * 1.6, r * 1.6, 0.25, 20), mat.steel, pts[0][0], pts[0][1], pts[0][2]);
-    const d = new T.Vector3(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1], pts[1][2] - pts[0][2]).normalize();
-    fl.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), d);
+    const P = pts.map((q) => new T.Vector3(q[0], q[1], q[2]));
+    const first = FLANGES.length;
+    const d0 = P[1].clone().sub(P[0]).normalize(), d1 = P[P.length - 1].clone().sub(P[P.length - 2]).normalize();
+    flange(P[0].clone().addScaledVector(d0, 0.4), d0, r);
+    flange(P[P.length - 1].clone().addScaledVector(d1, -0.4), d1, r);
+    curve.curves.forEach((c) => {
+      if (!c.isQuadraticBezierCurve3) return;
+      flange(c.v0, c.v1.clone().sub(c.v0), r);
+      flange(c.v2, c.v2.clone().sub(c.v1), r);
+    });
+    // short straight runs between two elbows get one flange at their middle instead of two overlapping
+    for (let i = first; i < FLANGES.length; i++) for (let j = i + 1; j < FLANGES.length; j++) {
+      if (FLANGES[i].p.distanceTo(FLANGES[j].p) < 0.7) { FLANGES.splice(j, 1); FLANGES.splice(i--, 1); break; } // back-to-back elbows: no flange
+    }
     return { curve, mesh, mat: m, color, tint: new T.Color(color) };
   };
+  // Short flanged stub where a line meets a vessel (reads as a real nozzle).
+  const nozzle = (x, y, z, dir, r, len, m) => {
+    const d = new T.Vector3(dir[0], dir[1], dir[2]).normalize();
+    const o = add(new T.CylinderGeometry(r, r, len, 16), m || mat.steel, x + d.x * len / 2, y + d.y * len / 2, z + d.z * len / 2);
+    o.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), d);
+    return o;
+  };
+  // Simple centrifugal pump skid: the line rises from its discharge (top of casing).
+  const pump = (x, z, y0) => {
+    const g = new T.Group(); g.position.set(x, y0, z); root.add(g);
+    add(new T.BoxGeometry(1.5, 0.3, 0.85), mat.darkSteel, 0.3, 0.15, 0, g);
+    const cas = add(new T.CylinderGeometry(0.38, 0.38, 0.5, 18), mat.steel, 0, 0.72, 0, g); cas.rotation.x = Math.PI / 2;
+    const mot = add(new T.CylinderGeometry(0.3, 0.3, 0.8, 16), mat.motor, 0.75, 0.64, 0, g); mot.rotation.z = Math.PI / 2;
+    return y0 + 0.95; // discharge height (inside casing top)
+  };
 
-  // Feed line from heater (left) into flash zone
-  const feed = line([[-30, 1.2, 6], [-18, 1.2, 6], [-12, 1.2, 0], [-9, 1.2, 0], [-9, Y.feedIn, 0], [-R - 0.1, Y.feedIn, 0]], 0.62, C.feed);
-  // LVGO draw (right, upper) → product line
-  const lvgo = line([[R + 0.05, Y.lvgoTray - 0.3, 0], [8.5, Y.lvgoTray - 0.3, 0], [8.5, 3.0, 0], [8.5, 3.0, 13], [14, 3.0, 13], [14, 3.0, 16.4]], 0.42, C.lvgo);
-  // HVGO draw (right, middle)
-  const hvgo = line([[R + 0.05, Y.hvgoTray - 0.3, 0], [6.6, Y.hvgoTray - 0.3, 0], [6.6, 1.6, 0], [6.6, 1.6, 11.4], [20, 1.6, 11.4], [20, 1.6, 16.4]], 0.46, C.hvgo);
-  // Vacuum residue from the boot bottom → downstream
-  const resid = line([[RB - 0.2, Y.residOut, 0], [5, Y.residOut, 0], [5, 1.3, 0], [5, 1.3, -4], [22, 1.3, -4]], 0.55, C.resid);
-  // Overhead vapor to vacuum system
-  const vac = line([[0, 59.4, 0], [0, 62, 0], [-6, 62, 0], [-6, 62, -10], [-14, 62, -10]], 0.7, C.vac);
+  // Charge heater (feed source, far left) — low-poly firebox + convection box + stack
+  const heater = new T.Group(); root.add(heater); heater.position.set(-33, 0, 6);
+  add(new T.BoxGeometry(6.4, 0.6, 5.2), mat.concrete, 0, 0.3, 0, heater);
+  add(new T.BoxGeometry(5, 5.6, 4), mat.darkSteel, 0, 3.4, 0, heater);
+  add(new T.BoxGeometry(3, 2, 2.6), mat.steel, 0, 7.2, 0, heater);
+  add(new T.CylinderGeometry(0.5, 0.6, 8, 14), mat.darkSteel, 0, 12.2, 0, heater);
+  nozzle(-30.5, 1.5, 6, [1, 0, 0], 0.8, 0.35);
+  // Feed line from the heater outlet into the flash zone (kept clear of the column plinth)
+  const feed = line([[-30.4, 1.5, 6], [-18, 1.5, 6], [-12, 1.5, 0], [-9, 1.5, 0], [-9, Y.feedIn, 0], [-R - 0.1, Y.feedIn, 0]], 0.62, C.feed);
+  // LVGO draw (right, upper) → LVGO barrel (ends just inside the drum wall)
+  const lvgo = line([[R + 0.05, Y.lvgoTray - 0.3, 0], [8.5, Y.lvgoTray - 0.3, 0], [8.5, 3.0, 0], [8.5, 3.0, 13], [14, 3.0, 13], [14, 3.0, 16.75]], 0.42, C.lvgo);
+  // HVGO draw (right, middle) → HVGO barrel
+  const hvgo = line([[R + 0.05, Y.hvgoTray - 0.3, 0], [6.6, Y.hvgoTray - 0.3, 0], [6.6, 1.6, 0], [6.6, 1.6, 11.4], [20, 1.6, 11.4], [20, 1.6, 16.75]], 0.46, C.hvgo);
+  // Vacuum residue from the boot bottom → bitumen tank inlet nozzle (was ending in mid-air at x=22)
+  const resid = line([[RB - 0.2, Y.residOut, 0], [5, Y.residOut, 0], [5, 1.4, 0], [5, 1.4, -4], [20.6, 1.4, -4], [20.6, 2.6, -4], [23.25, 2.6, -4]], 0.55, C.resid, 0.55);
+  // Overhead vapor to the vacuum system: drops into the top of the ejector riser
+  const vac = line([[0, 59.4, 0], [0, 62, 0], [-6, 62, 0], [-6, 62, -10], [-13.6, 62, -10], [-13.6, 60.6, -10]], 0.7, C.vac, 0.65);
   const streams = { lvgo, hvgo, resid, feed, vac };
 
-  // Return lines (pumparound / reflux) — decorative, back side
-  line([[-8.5, 3, -2.5], [-8.5, Y.lvgoDist + 0.2, -2.5], [-R - 0.05, Y.lvgoDist + 0.2, -2.5]], 0.32, 0x888888);
-  line([[-7.2, 3, -3.5], [-7.2, Y.hvgoDist + 0.2, -3.5], [-R + 0.05, Y.hvgoDist + 0.2, -2.0]], 0.32, 0x888888);
+  // Return lines (pumparound / reflux) — from pumps on the plinth back into shell nozzles.
+  // Line 1 meets the shell at z=-2.5; line 2 jogs to z=-2.2 and runs under the 40 m platform deck.
+  const PLINTH = 0.8;
+  const pr1 = pump(-8.5, -2.5, PLINTH), pr2 = pump(-7.2, -3.5, PLINTH);
+  const shellX = (z, y) => -Math.sqrt(Math.max(0.01, rAt(y) * rAt(y) - z * z)) + 0.08;
+  line([[-8.5, pr1, -2.5], [-8.5, Y.lvgoDist + 0.2, -2.5], [shellX(-2.5, Y.lvgoDist + 0.2), Y.lvgoDist + 0.2, -2.5]], 0.32, 0x888888);
+  const RET2Y = Y.hvgoDist - 0.6;
+  line([[-7.2, pr2, -3.5], [-7.2, RET2Y, -3.5], [-7.2, RET2Y, -2.2], [shellX(-2.2, RET2Y), RET2Y, -2.2]], 0.32, 0x888888, 0.6);
 
-  // Vacuum system package (ejectors) — generic block
+  // Vacuum system package (ejectors) — generic block; riser now stands on the pad and ties into a drum
   const vacPkg = new T.Group(); root.add(vacPkg); vacPkg.position.set(-17, 0, -10);
-  add(new T.BoxGeometry(6, 0.6, 5), mat.concrete, 0, 0.3, 0, vacPkg);
+  add(new T.BoxGeometry(8.6, 0.6, 5), mat.concrete, 0.6, 0.3, 0, vacPkg);
   [-1.5, 1.5].forEach((dx) => { add(new T.CylinderGeometry(0.9, 0.9, 7, 20), mat.pipe, dx, 4.1, 0, vacPkg); });
-  add(new T.CylinderGeometry(0.35, 0.35, 62 - 7.6, 10), mat.pipe, 3, 34.8, 0, vacPkg);
+  add(new T.CylinderGeometry(0.7, 0.7, 60.6 - 0.6, 18), mat.pipe, 3.4, 30.6, 0, vacPkg); // same bore as the overhead line
+  const tie = add(new T.CylinderGeometry(0.4, 0.4, 0.7, 14), mat.pipe, 2.55, 6.4, 0, vacPkg); tie.rotation.z = Math.PI / 2;
 
-  // Downstream: bitumen unit (residue destination) — generic building + tank
+  // Downstream: bitumen unit (residue destination) — vertical storage vessel + tall column
   const bit = new T.Group(); root.add(bit); bit.position.set(26, 0, -4);
   add(new T.BoxGeometry(7, 0.6, 7), mat.concrete, 0, 0.3, 0, bit);
-  const bitTank = add(new T.CylinderGeometry(2.4, 2.4, 6, 32), M({ color: 0x2b2420, metalness: 0.35, roughness: 0.55 }), -0.5, 3.6, 0, bit);
-  add(new T.CylinderGeometry(1.1, 1.1, 8, 20), mat.pipe, 2.4, 4.6, 1.8, bit);
-  const bitMat = bitTank.material; bitMat.emissive = new T.Color(C.bitumen); bitMat.emissiveIntensity = 0;
+  const bitMat = M({ color: 0x2b2420, metalness: 0.45, roughness: 0.5, envMap: envTex, envMapIntensity: 0.6, emissive: new T.Color(C.bitumen), emissiveIntensity: 0 });
+  const skirtMat = M({ color: 0x15130f, metalness: 0.3, roughness: 0.75, envMap: envTex, envMapIntensity: 0.3 });
+  const seamMat = M({ color: 0x4b4540, metalness: 0.55, roughness: 0.6, envMap: envTex, envMapIntensity: 0.5 });
+  const colMat = M({ color: 0x9aa2ab, metalness: 0.75, roughness: 0.38, envMap: envTex, envMapIntensity: 0.8 });
+  const colSkirtMat = M({ color: 0x3a4048, metalness: 0.5, roughness: 0.65, envMap: envTex, envMapIntensity: 0.4 });
+  const headGeo = new T.SphereGeometry(1, 28, 8, 0, Math.PI * 2, 0, Math.PI / 2); // unit hemisphere, scaled per vessel
+  const seamGeoT = new T.TorusGeometry(2.42, 0.035, 4, 48), seamGeoC = new T.TorusGeometry(1.12, 0.03, 4, 32);
+  const ring = (geo, m, x, y, z) => { const o = add(geo, m, x, y, z, bit); o.rotation.x = Math.PI / 2; o.castShadow = false; return o; };
+  // tank: darker skirt 0.6–1.4, shell 1.4–5.6, 2:1 dished head to 6.6
+  const TX = -0.5;
+  add(new T.CylinderGeometry(2.3, 2.36, 0.8, 32), skirtMat, TX, 1.0, 0, bit);
+  add(new T.CylinderGeometry(2.4, 2.4, 4.2, 32), bitMat, TX, 3.5, 0, bit);
+  const tHead = add(headGeo, bitMat, TX, 5.6, 0, bit); tHead.scale.set(2.4, 1.0, 2.4);
+  ring(seamGeoT, seamMat, TX, 1.42, 0); [2.45, 3.5, 4.55].forEach((y) => ring(seamGeoT, seamMat, TX, y, 0));
+  add(new T.CylinderGeometry(0.35, 0.35, 0.3, 14), seamMat, TX + 1.0, 6.25, 0.5, bit); // roof manway
+  // column: skirt 0.6–1.6, shell 1.6–8.0, hemispherical head; nudged 0.2 so it no longer intersects the tank
+  const CX = 2.6, CZ = 2.0, CW = [26 + CX, -4 + CZ];
+  add(new T.CylinderGeometry(1.05, 1.12, 1.0, 24), colSkirtMat, CX, 1.1, CZ, bit);
+  add(new T.CylinderGeometry(1.1, 1.1, 6.4, 24), colMat, CX, 4.8, CZ, bit);
+  const cHead = add(headGeo, colMat, CX, 8.0, CZ, bit); cHead.scale.set(1.1, 0.55, 1.1);
+  [1.62, 3.2, 4.8, 6.4, 7.98].forEach((y) => ring(seamGeoC, mat.steel, CX, y, CZ));
+  // top platform (grating + yellow handrail) and caged ladder on the +x side
+  const PY = 7.4;
+  const deck = add(new T.RingGeometry(1.18, 2.0, 32), mat.grate, CX, PY, CZ, bit); deck.rotation.x = -Math.PI / 2;
+  const railGeo = new T.TorusGeometry(1.96, 0.04, 4, 32);
+  [0.55, 1.1].forEach((h) => ring(railGeo, mat.yellow, CX, PY + h, CZ));
+  const postGeo = new T.CylinderGeometry(0.03, 0.03, 1.1, 5);
+  for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI * 2; add(postGeo, mat.yellow, CX + Math.cos(a) * 1.96, PY + 0.55, CZ + Math.sin(a) * 1.96, bit); }
+  const LX = CX + 1.45, rungRail = new T.CylinderGeometry(0.035, 0.035, PY + 1.1 - 0.6, 6);
+  [-0.22, 0.22].forEach((dz) => add(rungRail, mat.steel, LX, (PY + 1.1 + 0.6) / 2, CZ + dz, bit));
+  const rungGeo = new T.CylinderGeometry(0.02, 0.02, 0.44, 4);
+  for (let y = 0.9; y < PY + 1; y += 0.35) { const r0 = add(rungGeo, mat.steel, LX, y, CZ, bit); r0.rotation.x = Math.PI / 2; r0.castShadow = false; }
+  const cageGeo = new T.TorusGeometry(0.42, 0.022, 4, 14, Math.PI * 1.2);
+  for (let y = 2.6; y < PY + 1.1; y += 0.7) { const c0 = add(cageGeo, mat.yellow, LX + 0.05, y, CZ, bit); c0.rotation.set(Math.PI / 2, 0, -Math.PI * 0.6); c0.castShadow = false; }
+  // nozzles where lines connect (flanges come from the shared flange instances)
+  nozzle(26 + TX - 2.38, 2.6, -4, [-1, 0, 0], 0.66, 0.3);              // residue inlet
+  const VRX = 26.6, VRZ = -4 + Math.sqrt(2.4 * 2.4 - (VRX - 26 - TX) ** 2);
+  nozzle(VRX, 2.2, VRZ - 0.05, [0, 0, 1], 0.36, 0.3);                  // product outlet → VR barrel
+  nozzle(26 + TX, 6.5, -4, [0, 1, 0], 0.3, 0.3);                       // tank vapour outlet
+  nozzle(CW[0], 8.45, CW[1], [0, 1, 0], 0.3, 0.25);                    // column top inlet
+  // tank vapour → column top (rises clear of the platform, then drops into the head nozzle)
+  line([[26 + TX, 6.5, -4], [26 + TX, 9.4, -4], [26 + TX, 9.4, CW[1]], [CW[0], 9.4, CW[1]], [CW[0], 8.5, CW[1]]], 0.24, 0x888888, 0.4);
   // Product destinations at line ends (simple tanks)
   // GOR product barrels (clickable via HTML tags) — illustrative product yard
   const BZ = 18, BARREL = {};
   add(new T.BoxGeometry(22, 0.3, 5), mat.concrete, 17, 0.15, BZ);
-  const VR_LINE = line([[27.6, 1.0, -0.6], [27.6, 1.0, 18], [27.4, 1.0, 18]], 0.3, C.resid);
+  // VR / bitumen product line: tank outlet → VR barrel (ends just inside the drum wall)
+  const VR_LINE = line([[VRX, 2.2, VRZ], [VRX, 2.2, 0.4], [VRX, 1.0, 0.4], [VRX, 1.0, 16.85]], 0.3, C.resid, 0.5);
   VR_LINE.mat.emissiveIntensity = 0.25;
-  const bGeo = new T.CylinderGeometry(1.45, 1.45, 3.8, 44), ribGeo = new T.TorusGeometry(1.46, 0.09, 8, 44), lidGeo = new T.CylinderGeometry(1.32, 1.32, 0.06, 44), bungGeo = new T.CylinderGeometry(0.2, 0.2, 0.14, 12);
-  const lidMat = M({ color: 0x9aa3ad, metalness: 0.85, roughness: 0.3 });
+
+  // Steel oil drums: glossy black painted steel (PBR) with lighter, rougher worn edges on chimes and hoops.
+  const drumTex = canvasTex(256, 256, (g, w, h) => {
+    g.fillStyle = '#111214'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 260; i++) { // scuffs concentrate near the top/bottom chimes
+      const edge = Math.random() < 0.5 ? Math.random() * 0.12 : 1 - Math.random() * 0.12;
+      g.fillStyle = 'rgba(' + (52 + Math.random() * 20 | 0) + ',54,58,' + (0.04 + Math.random() * 0.08).toFixed(2) + ')';
+      g.fillRect(Math.random() * w, edge * h, 1 + Math.random() * 9, 1 + Math.random() * 2);
+    }
+    for (let i = 0; i < 40; i++) { g.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.025).toFixed(3) + ')'; g.fillRect(Math.random() * w, Math.random() * h, 1, 4 + Math.random() * 18); }
+  });
+  const drumRough = canvasTex(256, 256, (g, w, h) => {
+    g.fillStyle = 'rgb(90,90,90)'; g.fillRect(0, 0, w, h); // ≈0.35 × roughness 1
+    for (let i = 0; i < 180; i++) {
+      const edge = Math.random() < 0.5 ? Math.random() * 0.08 : 1 - Math.random() * 0.08, v = 100 + Math.random() * 16 | 0;
+      g.fillStyle = 'rgb(' + v + ',' + v + ',' + v + ')'; g.fillRect(Math.random() * w, edge * h, 2 + Math.random() * 10, 1 + Math.random() * 3);
+    }
+  });
+  drumRough.encoding = T.LinearEncoding;
+  const bGeo = new T.CylinderGeometry(1.45, 1.45, 3.8, 44), ribGeo = new T.TorusGeometry(1.46, 0.09, 8, 44), chimeGeo = new T.TorusGeometry(1.45, 0.08, 8, 44);
+  const lidGeo = new T.CylinderGeometry(1.32, 1.32, 0.06, 44), bungGeo = new T.CylinderGeometry(0.2, 0.2, 0.14, 12), bung2Geo = new T.CylinderGeometry(0.13, 0.13, 0.12, 10);
+  // metalness 0.6 / roughness ≈0.35 base, plus a thin clear lacquer so the black paint shows real highlights
+  const drumBase = { color: 0xffffff, map: drumTex, roughnessMap: drumRough, metalness: 0.6, roughness: 1, clearcoat: 1, clearcoatRoughness: 0.18, envMap: envTex, envMapIntensity: 1.5 };
+  const wornMat = M({ color: 0x1b1d20, metalness: 0.55, roughness: 0.62, envMap: envTex, envMapIntensity: 0.24 });
+  const lidPaint = M({ color: 0x141518, metalness: 0.6, roughness: 0.38, envMap: envTex, envMapIntensity: 0.9 });
+  const lidMat = M({ color: 0x8a9099, metalness: 0.85, roughness: 0.32, envMap: envTex, envMapIntensity: 0.9 });
   [['vdo', 8, 0x4fb3a5], ['lvgo', 14, C.lvgo], ['hvgo', 20, C.hvgo], ['vr', 26, C.resid]].forEach(([k, x, col]) => {
     const g = new T.Group(); root.add(g); g.position.set(x, 0.3, BZ);
-    const bm = M({ color: col, metalness: 0.35, roughness: 0.42, emissive: new T.Color(col), emissiveIntensity: 0.08 });
+    // product colour only as a faint emissive cue while that product is in focus (labels carry identity)
+    const bm = new T.MeshPhysicalMaterial(Object.assign({ emissive: new T.Color(col), emissiveIntensity: 0 }, drumBase));
     const body = add(bGeo, bm, 0, 1.9, 0, g); body.castShadow = true;
-    [0.45, 1.33, 2.47, 3.35].forEach((y) => { const r = add(ribGeo, bm, 0, y, 0, g); r.rotation.x = Math.PI / 2; });
-    add(lidGeo, lidMat, 0, 3.82, 0, g);
+    [0.45, 1.33, 2.47, 3.35].forEach((y) => { const r = add(ribGeo, wornMat, 0, y, 0, g); r.rotation.x = Math.PI / 2; r.castShadow = false; });
+    // rolled chimes wrap the body's top and bottom edges (the edge sits inside the tube: no visible seam)
+    [0.0, 3.8].forEach((y) => { const r = add(chimeGeo, wornMat, 0, y, 0, g); r.rotation.x = Math.PI / 2; r.castShadow = false; });
+    add(lidGeo, lidPaint, 0, 3.82, 0, g);
     add(bungGeo, lidMat, 0.7, 3.9, 0.25, g);
+    add(bung2Geo, lidMat, -0.78, 3.88, -0.3, g);
     BARREL[k] = { g, mat: bm };
   });
-
 
   // ---------- Internals (back half sections + cut faces) ----------
   const internals = new T.Group(); root.add(internals);
@@ -607,7 +749,9 @@ window.GORVDU = function (opts) {
   // stripping-steam sparger below the trays + steam inlet nozzle
   const sparger = add(new T.TorusGeometry(R - 1.2, 0.12, 8, 40, Math.PI), mat.steel, 0, Y.strip[0] - 0.9, 0, internals); sparger.rotation.set(-Math.PI / 2, 0, 0);
   for (let k = 0; k < 12; k++) { const a = Math.PI * (k + 0.5) / 12; add(new T.CylinderGeometry(0.04, 0.04, 0.2, 5), mat.steel, Math.cos(a) * (R - 1.2), Y.strip[0] - 0.75, -Math.sin(a) * (R - 1.2), internals); }
-  const steamIn = line([[-R - 2.5, Y.strip[0] - 0.9, -1.4], [-R + 0.1, Y.strip[0] - 0.9, -1.4]], 0.18, 0xcfd8e2);
+  // steam supply: utility station on the plinth → riser → sparger nozzle on the boot cone
+  add(new T.BoxGeometry(0.9, 1.1, 0.9), mat.darkSteel, -6.7, PLINTH + 0.55, -1.4);
+  const steamIn = line([[-6.7, PLINTH + 1.0, -1.4], [-6.7, Y.strip[0] - 0.9, -1.4], [shellX(-1.4, Y.strip[0] - 0.9), Y.strip[0] - 0.9, -1.4]], 0.18, 0xcfd8e2);
   // manways on the back wall (bolted covers seen from inside)
   [22.6, 30.2, 37.6, 45.0, 55.0].forEach((y) => {
     const rr = rAt(y) - 0.2;
@@ -631,7 +775,7 @@ window.GORVDU = function (opts) {
   add(new T.BoxGeometry(0.4, 0.5, 0.35), detailMat.gauge, RT + 0.5, 56.6, 0.8);
   add(new T.CylinderGeometry(0.75, 0.75, 1.2, 20), mat.steel, 0, 58.6, -0.2, internals);
   // pumparound return stubs into the distributor headers
-  [Y.lvgoDist, Y.hvgoDist].forEach((y) => { const st = add(new T.CylinderGeometry(0.22, 0.22, 1.2, 12), mat.pipe, -R + 0.55, y + 0.2, -1.6, internals); st.rotation.z = Math.PI / 2; });
+  [Y.lvgoDist + 0.2, RET2Y].forEach((y) => { const st = add(new T.CylinderGeometry(0.22, 0.22, 1.2, 12), mat.pipe, -R + 0.55, y, -1.6, internals); st.rotation.z = Math.PI / 2; });
 
   // liquid film trickling down the packed-bed cut faces (animated streak texture)
   const streakTex = canvasTex(128, 256, (g, w, h) => {
@@ -676,6 +820,18 @@ window.GORVDU = function (opts) {
       L.el.style.opacity = fade.toFixed(2);
       L.el.style.transform = 'translate(' + ((proj.x + 1) / 2 * w).toFixed(1) + 'px,' + ((1 - proj.y) / 2 * h).toFixed(1) + 'px) translate(-50%,-100%)';
     });
+  }
+
+  // ---------- Pipe flanges (one InstancedMesh for every line) ----------
+  {
+    const fGeo = new T.CylinderGeometry(1, 1, 1, 20);
+    const fMesh = new T.InstancedMesh(fGeo, mat.steel, FLANGES.length);
+    const o = new T.Object3D(), up = new T.Vector3(0, 1, 0);
+    FLANGES.forEach((f, i) => {
+      o.position.copy(f.p); o.quaternion.setFromUnitVectors(up, f.d); o.scale.set(f.r * 1.55, 0.16, f.r * 1.55);
+      o.updateMatrix(); fMesh.setMatrixAt(i, o.matrix);
+    });
+    fMesh.castShadow = true; fMesh.receiveShadow = true; root.add(fMesh);
   }
 
   // ---------- 3D labels ----------
@@ -795,10 +951,11 @@ window.GORVDU = function (opts) {
     residMat.emissiveIntensity = 0.1 + 0.7 * focus.resid;
     ['lvgoBed', 'hvgoBed'].forEach((k) => { const f = k === 'lvgoBed' ? focus.lvgo : focus.hvgo; colTmp.set(k === 'lvgoBed' ? C.lvgo : C.hvgo).multiplyScalar(0.35 * f); zoneMeshes[k].material.emissive.copy(colTmp); });
     const yard = band(0.84, 0.875, 0.93, 0.955, p);
-    BARREL.lvgo.mat.emissiveIntensity = 0.08 + 0.5 * focus.lvgo + 0.12 * yard;
-    BARREL.hvgo.mat.emissiveIntensity = 0.08 + 0.5 * focus.hvgo + 0.12 * yard;
-    BARREL.vr.mat.emissiveIntensity = 0.08 + 0.5 * focus.resid + 0.12 * yard;
-    BARREL.vdo.mat.emissiveIntensity = 0.08 + 0.12 * yard;
+    // black drums: only a faint product-colour cue while that product is in focus
+    BARREL.lvgo.mat.emissiveIntensity = 0.12 * focus.lvgo;
+    BARREL.hvgo.mat.emissiveIntensity = 0.12 * focus.hvgo;
+    BARREL.vr.mat.emissiveIntensity = 0.12 * focus.resid;
+    BARREL.vdo.mat.emissiveIntensity = 0;
     bitMat.emissiveIntensity = 0.5 * band(0.76, 0.8, 0.84, 0.88, p) + 0.2 * finalAll;
 
     // flare flicker
@@ -809,6 +966,57 @@ window.GORVDU = function (opts) {
     placeLabels({
       vdo: yard, lvgo: yard, hvgo: yard, resid: yard,
       bitumen: clamp(band(0.76, 0.79, 0.84, 0.87, p) + finalAll, 0, 1), feed: band(0.28, 0.31, 0.36, 0.4, p), vac: finalAll,
+    });
+  }
+
+  // ---------- Barrel hit-testing: tap / click a drum to open its product page ----------
+  // The drums are WebGL meshes, so they need a raycast; the HTML tags above them are hidden
+  // on phones (they would cover the text panel). Works for mouse, pen and touch alike.
+  {
+    const ray = new T.Raycaster(), ndc = new T.Vector2();
+    const LINK = { vdo: 'vdo', lvgo: 'lvgo', hvgo: 'hvgo', vr: 'resid' };
+    const keys = Object.keys(BARREL);
+    const groups = keys.map((k) => BARREL[k].g);
+    const hitAt = (x, y) => {
+      if (S.p < 0.84) return null; // drums are only framed in the final chapter
+      const r = canvas.getBoundingClientRect();
+      if (!r.width || x < r.left || x > r.right || y < r.top || y > r.bottom) return null;
+      ndc.set(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      const hit = ray.intersectObjects(groups, true)[0];
+      if (!hit) return null;
+      for (let o = hit.object; o; o = o.parent) { const i = groups.indexOf(o); if (i >= 0) return LINK[keys[i]]; }
+      return null;
+    };
+    const open = (label) => { const a = qs('a.tag-link[data-label="' + label + '"]'); if (a) a.click(); };
+    let down = null;
+    const onDown = (e) => {
+      if (!e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      down = e.target.closest('a,button') ? null : { x: e.clientX, y: e.clientY, t: performance.now() };
+    };
+    const onUp = (e) => {
+      const d = down; down = null;
+      if (!d || !e.isPrimary) return;
+      // A tap, not a scroll swipe: little movement, short press.
+      if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 10 || performance.now() - d.t > 700) return;
+      const label = hitAt(e.clientX, e.clientY);
+      if (label) { e.preventDefault(); open(label); }
+    };
+    const onCancel = () => { down = null; };
+    const onHover = (e) => {
+      if (e.pointerType !== 'mouse') return;
+      STAGE.style.cursor = !e.target.closest('a,button') && hitAt(e.clientX, e.clientY) ? 'pointer' : '';
+    };
+    STAGE.addEventListener('pointerdown', onDown, { passive: true });
+    STAGE.addEventListener('pointerup', onUp);
+    STAGE.addEventListener('pointercancel', onCancel, { passive: true });
+    STAGE.addEventListener('pointermove', onHover, { passive: true });
+    cleanup.push(() => {
+      STAGE.removeEventListener('pointerdown', onDown);
+      STAGE.removeEventListener('pointerup', onUp);
+      STAGE.removeEventListener('pointercancel', onCancel);
+      STAGE.removeEventListener('pointermove', onHover);
+      STAGE.style.cursor = '';
     });
   }
 

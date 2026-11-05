@@ -89,7 +89,8 @@ const LABELS: Array<[keyof Enquiry, string]> = [
   ["subject", "Subject"],
 ];
 
-export async function sendEnquiryEmail(e: Enquiry, locale: string): Promise<void> {
+/** Sends the enquiry; resolves with the provider's message id only once Resend accepted it. */
+export async function sendEnquiryEmail(e: Enquiry, locale: string): Promise<string> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.CONTACT_FROM_EMAIL;
   if (!apiKey || !from) throw new Error("Email is not configured (RESEND_API_KEY / CONTACT_FROM_EMAIL)");
@@ -126,10 +127,14 @@ export async function sendEnquiryEmail(e: Enquiry, locale: string): Promise<void
       text,
       html,
     }),
-    signal: AbortSignal.timeout(15_000),
+    // Below the form's 15 s client timeout, so the visitor gets the real server answer.
+    signal: AbortSignal.timeout(10_000),
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
     throw new Error(`Resend responded ${res.status}: ${detail.slice(0, 300)}`);
   }
+  const data = (await res.json().catch(() => null)) as { id?: unknown } | null;
+  if (!data || typeof data.id !== "string") throw new Error("Resend accepted the request but returned no message id");
+  return data.id;
 }

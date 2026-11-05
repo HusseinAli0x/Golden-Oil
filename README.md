@@ -32,7 +32,7 @@ cp .env.example .env.local   # then edit NEXT_PUBLIC_SITE_URL
 
 | Route | What |
 | --- | --- |
-| `/` | Intro — Golden Network Holding logo animation, then opens Home (once per session, `sessionStorage`). Skip button. |
+| `/` | Intro — Golden Network Holding logo animation, then opens Home (once per session, `sessionStorage`), about 5.6 s. |
 | `/en`, `/ar` | Home: hero, film (lightbox), 8-stage process with scroll-driven oil pipe, 3D site model, products + details modal + full-size photo, about teaser |
 | `/{lang}/about` · `/facilities` · `/products` · `/technology` · `/quality` · `/sustainability` | Inner pages |
 | `/{lang}/site-model` | Full-screen 3D viewer: camera presets, day/night, pan/zoom/keyboard |

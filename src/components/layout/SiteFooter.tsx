@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { LangSwitch, LiveLangSwitch } from "@/components/nav/LangSwitch";
 import { localePath, type Dictionary, type Locale } from "@/lib/i18n";
 import { CONTACT, COPYRIGHT_YEAR, IMAGES, NAV_ITEMS, PRODUCTS, mailtoHref } from "@/lib/site";
 
@@ -55,7 +57,12 @@ export function SiteFooter({ locale, dict }: SiteFooterProps) {
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-between gap-3 border-t border-white/10 pt-5 text-[13px]">
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-t border-white/10 pt-5 text-[13px]">
+            <div className="order-first basis-full min-[760px]:order-last min-[760px]:basis-auto">
+              <Suspense fallback={<LangSwitch locale={locale} pathname={null} label={t.langLabel} switchAria={t.langAria} tone="dark" />}>
+                <LiveLangSwitch locale={locale} label={t.langLabel} switchAria={t.langAria} tone="dark" />
+              </Suspense>
+            </div>
             <span>
               © {COPYRIGHT_YEAR} Golden Oil Refinery (GOR). {t.footer.rights}
             </span>

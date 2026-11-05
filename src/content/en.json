@@ -47,6 +47,7 @@
     "menuClose": "Close menu",
     "otherLang": "العربية",
     "langAria": "Switch to Arabic",
+    "langLabel": "Language",
     "nav": {
       "home": "Home",
       "about": "About Us",
@@ -496,14 +497,21 @@
     "other": "Other / not sure yet",
     "subject": "Subject",
     "sending": "Sending…",
-    "success": "Your enquiry has been sent successfully. Thank you for contacting Golden Oil Refinery.",
-    "error": "Sorry, your enquiry could not be sent. Please try again in a few minutes.",
+    "success": "Your enquiry was sent. We'll contact you soon.",
+    "error": "Sorry, your enquiry could not be sent. Please try again.",
     "errRequired": "Please fill in this field.",
     "errEmail": "Please enter a valid email address.",
     "errShort": "Please write a little more (at least 10 characters).",
     "errRate": "Too many enquiries were sent from this connection. Please try again later.",
     "errSpam": "Your enquiry could not be verified. Please wait a moment and try again.",
-    "website": "Leave this field empty"
+    "website": "Leave this field empty",
+    "errPhone": "Please enter a valid phone number (digits, spaces, + and - only).",
+    "errInvalid": "Please check the highlighted fields and try again.",
+    "errSend": "Your enquiry could not be delivered right now. Nothing was sent — please try again.",
+    "errUnavailable": "The enquiry form is temporarily unavailable. Nothing was sent — please call or email the refinery directly.",
+    "errTimeout": "The server took too long to respond. Your enquiry may not have been sent — please try again.",
+    "errNetwork": "Connection problem: your enquiry was not sent. Check your connection and try again.",
+    "retry": "Try again"
   },
   "vacuum": {
     "s1a": "Vacuum",

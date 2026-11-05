@@ -24,9 +24,12 @@ export const MAX_LENGTH: Record<EnquiryField, number> = {
 export const MIN_MESSAGE = 10;
 
 /** Error codes map to dictionary keys on the client. */
-export type FieldError = "errRequired" | "errEmail" | "errShort";
+export type FieldError = "errRequired" | "errEmail" | "errShort" | "errPhone";
 
 const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"]{2,}$/;
+/** Optional phone: digits with the usual separators, optional leading +, 7–15 digits in total. */
+const PHONE_RE = /^\+?[0-9٠-٩\s().-]+$/;
+const phoneDigits = (s: string) => s.replace(/[^0-9٠-٩]/g, "").length;
 
 /** Trims every field, drops unknown keys, cuts over-long values and strips control characters. */
 export function normalizeEnquiry(input: Record<string, unknown>): Enquiry {
@@ -45,5 +48,6 @@ export function validateEnquiry(e: Enquiry): Partial<Record<EnquiryField, FieldE
   for (const k of REQUIRED_FIELDS) if (!e[k]) errors[k] = "errRequired";
   if (e.email && !EMAIL_RE.test(e.email)) errors.email = "errEmail";
   if (e.message && e.message.length < MIN_MESSAGE) errors.message = "errShort";
+  if (e.phone && (!PHONE_RE.test(e.phone) || phoneDigits(e.phone) < 7 || phoneDigits(e.phone) > 15)) errors.phone = "errPhone";
   return errors;
 }

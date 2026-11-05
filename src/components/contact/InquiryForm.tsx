@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { CircleAlert, CircleCheck, LoaderCircle, Send } from "lucide-react";
+import { CircleAlert, CircleCheck, LoaderCircle, RotateCcw, Send } from "lucide-react";
 import { ENQUIRY_FIELDS, MAX_LENGTH, normalizeEnquiry, validateEnquiry, type EnquiryField, type FieldError } from "@/lib/enquiry";
 import type { Dictionary, Locale } from "@/lib/i18n";
 
@@ -12,13 +12,21 @@ type Status = "idle" | "sending" | "success" | "error";
 /** Slightly above the server's 3 s minimum form age (src/lib/server/mailer.ts). */
 const MIN_TOKEN_AGE_MS = 3_200;
 
-type ServerError = "spam" | "rate" | "send" | "invalid" | "unavailable" | "bad-request";
+/** Whole submission (token wait + request) gives up after this long. */
+const TIMEOUT_MS = 15_000;
+
+type ServerError = "spam" | "token" | "rate" | "send" | "invalid" | "unavailable" | "bad-request";
+type ClientError = ServerError | "timeout" | "network";
 
 /**
  * Enquiry form. Submits in the background with fetch to /api/contact, which emails
  * the refinery from the server — no page reload, no redirect, no mail app, no mailto.
  * Spam checks: hidden honeypot field, a signed timing token, same-origin check and
  * a per-connection rate limit.
+ *
+ * Success is shown only when the server answers `{ ok: true }`, which it does only
+ * after the email provider accepted the message. Any failure keeps what was typed
+ * and offers a retry; the whole attempt times out after 15 s.
  */
 export function InquiryForm({ t, products, locale }: { t: Dictionary["contact"]; products: ReadonlyArray<string>; locale: Locale }) {
   const [status, setStatus] = useState<Status>("idle");
@@ -51,7 +59,30 @@ export function InquiryForm({ t, products, locale }: { t: Dictionary["contact"];
 
   useEffect(loadToken, [loadToken]);
 
-  const serverMessage = (code: ServerError | undefined) => (code === "rate" ? t.errRate : code === "spam" ? t.errSpam : t.error);
+  const errorMessage = (code: ClientError | undefined) => {
+    switch (code) {
+      case "rate":
+        return t.errRate;
+      case "spam":
+      case "token":
+        return t.errSpam;
+      case "unavailable":
+        return t.errUnavailable;
+      case "send":
+        return t.errSend;
+      case "invalid":
+        return t.errInvalid;
+      case "timeout":
+        return t.errTimeout;
+      case "network":
+        return t.errNetwork;
+      default:
+        return t.error;
+    }
+  };
+
+  const focusFirst = (form: HTMLFormElement, found: Partial<Record<EnquiryField, FieldError>>) =>
+    form.querySelector<HTMLElement>(`[name="${ENQUIRY_FIELDS.find((k) => found[k])}"]`)?.focus();
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // stay on the page: no navigation, no reload
@@ -64,37 +95,54 @@ export function InquiryForm({ t, products, locale }: { t: Dictionary["contact"];
     if (Object.keys(found).length) {
       setStatus("idle");
       setMessage("");
-      form.querySelector<HTMLElement>(`[name="${ENQUIRY_FIELDS.find((k) => found[k])}"]`)?.focus();
+      focusFirst(form, found);
       return;
     }
 
     busy.current = true;
     setStatus("sending");
     setMessage("");
-    try {
+    const ctrl = new AbortController();
+    const timer = window.setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+    const post = async () => {
       const formToken = await readyToken();
+      if (ctrl.signal.aborted) throw new DOMException("timeout", "AbortError");
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...enquiry, website: String(data.get("website") ?? ""), token: formToken, locale }),
+        signal: ctrl.signal,
       });
       const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: ServerError; fields?: Partial<Record<EnquiryField, FieldError>> };
-      if (res.ok && body.ok) {
-        form.reset(); // clear only after the email was delivered
+      return { ok: res.ok && body.ok === true, body };
+    };
+    try {
+      let result = await post();
+      // An expired or missing form token (e.g. the page sat open for hours): get a fresh one and retry once.
+      if (!result.ok && result.body.error === "token") {
+        token.current = null;
+        result = await post();
+      }
+      if (result.ok) {
+        form.reset(); // clear only after the server confirmed delivery
         setErrors({});
         setStatus("success");
         setMessage(t.success);
       } else {
-        if (body.fields) setErrors(body.fields);
+        if (result.body.fields) {
+          setErrors(result.body.fields);
+          focusFirst(form, result.body.fields);
+        }
         setStatus("error");
-        setMessage(serverMessage(body.error));
+        setMessage(errorMessage(result.body.error));
       }
-    } catch {
+    } catch (err) {
       setStatus("error");
-      setMessage(t.error);
+      setMessage(errorMessage(err instanceof DOMException && err.name === "AbortError" ? "timeout" : "network"));
     } finally {
+      window.clearTimeout(timer);
       busy.current = false;
-      loadToken(); // tokens are per form; fetch a fresh one for any next enquiry
+      loadToken(); // tokens are per form; fetch a fresh one for any next attempt
     }
   };
 
@@ -150,6 +198,7 @@ export function InquiryForm({ t, products, locale }: { t: Dictionary["contact"];
         <label className={label}>
           {t.phone}
           <input type="tel" dir="ltr" autoComplete="tel" className={`${field} text-start`} {...a11y("phone")} />
+          {err("phone")}
         </label>
         <label className={`${label} min-[640px]:col-span-2`}>
           {t.product}
@@ -205,7 +254,15 @@ export function InquiryForm({ t, products, locale }: { t: Dictionary["contact"];
               }`}
             >
               {status === "success" ? <CircleCheck size={19} aria-hidden className="mt-0.5 shrink-0" /> : <CircleAlert size={19} aria-hidden className="mt-0.5 shrink-0" />}
-              {message}
+              <span className="flex flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                <span>{message}</span>
+                {status === "error" && (
+                  <button type="submit" className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-error/40 bg-surface px-4 text-sm font-semibold text-error hover:border-error">
+                    <RotateCcw size={15} aria-hidden className="rtl:-scale-x-100" />
+                    {t.retry}
+                  </button>
+                )}
+              </span>
             </p>
           )}
         </div>

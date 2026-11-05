@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored third-party bundles (three.js r147 UMD + its post-processing build).
+    "public/vdu/three.r147.min.js",
+    "public/vdu/postprocessing.js",
   ]),
 ]);
 

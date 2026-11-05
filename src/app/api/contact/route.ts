@@ -5,7 +5,11 @@ import { checkToken, issueToken, mailerConfigured, rateLimited, sendEnquiryEmail
  * Enquiry form endpoint (called with fetch — no page navigation).
  * GET  → a short-lived signed form token (anti-bot timing check).
  * POST → validates, runs spam checks, and emails the enquiry to the refinery.
- * Responses carry an `error` code the form maps to a localized message.
+ * Responses carry an `error` code the form maps to a localized message:
+ *   spam (403, cross-origin) · unavailable (503, email not configured) · bad-request (4xx)
+ *   token (400, form token missing/expired — the form fetches a new one and retries once)
+ *   rate (429) · invalid (422, with per-field codes) · send (502, the email provider refused or timed out)
+ * `{ ok: true }` is returned only after the email provider accepted the message.
  */
 
 const json = (body: unknown, status = 200) =>
@@ -36,9 +40,12 @@ function sameOrigin(req: Request): boolean {
 }
 
 export async function POST(req: Request) {
-  if (!sameOrigin(req)) return json({ error: "spam" }, 403);
+  if (!sameOrigin(req)) {
+    console.warn("[contact] rejected: cross-origin request from", req.headers.get("origin"));
+    return json({ error: "spam" }, 403);
+  }
   if (!mailerConfigured()) {
-    console.error("[contact] RESEND_API_KEY / CONTACT_FROM_EMAIL are not set; enquiry not sent.");
+    console.error("[contact] RESEND_API_KEY and/or CONTACT_FROM_EMAIL are not set in this environment; enquiry not sent.");
     return json({ error: "unavailable" }, 503);
   }
   if (!req.headers.get("content-type")?.includes("application/json")) return json({ error: "bad-request" }, 415);
@@ -56,9 +63,16 @@ export async function POST(req: Request) {
   // Honeypot: a hidden field real visitors never fill. Pretend success so bots learn nothing.
   if (typeof body.website === "string" && body.website.trim() !== "") return json({ ok: true });
 
-  if (checkToken(body.token) !== "ok") return json({ error: "spam" }, 400);
+  const tokenState = checkToken(body.token);
+  if (tokenState !== "ok") {
+    console.warn(`[contact] rejected: form token ${tokenState}`);
+    return json({ error: "token" }, 400);
+  }
 
-  if (rateLimited(clientIp(req))) return json({ error: "rate" }, 429);
+  if (rateLimited(clientIp(req))) {
+    console.warn("[contact] rejected: rate limit");
+    return json({ error: "rate" }, 429);
+  }
 
   const enquiry = normalizeEnquiry(body);
   const fields = validateEnquiry(enquiry);
@@ -66,7 +80,8 @@ export async function POST(req: Request) {
 
   const locale = body.locale === "ar" ? "ar" : "en";
   try {
-    await sendEnquiryEmail(enquiry, locale);
+    const id = await sendEnquiryEmail(enquiry, locale);
+    console.info(`[contact] enquiry delivered to the email provider (id ${id})`);
   } catch (err) {
     console.error("[contact] email send failed:", err instanceof Error ? err.message : err);
     return json({ error: "send" }, 502);

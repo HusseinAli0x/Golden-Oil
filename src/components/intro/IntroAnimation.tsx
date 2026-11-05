@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { INTRO_MARK, INTRO_STROKES } from "@/components/animations/intro-paths";
 import { DEFAULT_LOCALE, isLocale, LANG_STORAGE_KEY, type Locale } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/scroll-progress";
@@ -11,10 +11,16 @@ const SEEN_KEY = "gor-intro-seen";
 const GOLD = "#D4A72C";
 const SPARK = "#E07B2A";
 
-/** Timeline from design/Intro.dc.html: draw (≈3 s) → mark → names → hold, then fade out. */
-const LEAVE_MS = 7600;
-const LEAVE_REDUCED_MS = 1500;
-const FADE_MS = 700;
+/**
+ * Timeline from design/Intro.dc.html: draw → mark → names → hold, then fade out.
+ * The whole timeline (every CSS duration and delay, the stroke timings and these
+ * timers) is scaled by one factor, so the sequence is identical, just faster.
+ * 0.67 → about 5.6 s instead of 8.3 s.
+ */
+const INTRO_SPEED = 0.67;
+const LEAVE_MS = Math.round(7600 * INTRO_SPEED);
+const LEAVE_REDUCED_MS = Math.round(1500 * INTRO_SPEED);
+const FADE_MS = Math.round(700 * INTRO_SPEED);
 
 const noopSubscribe = () => () => {};
 
@@ -31,7 +37,7 @@ function preferredLocale(): Locale {
 /**
  * Site entry (design/Intro.dc.html): the Golden Network Holding mark is drawn
  * stroke by stroke from a glowing hub, settles into the solid logo, the names
- * reveal, then the intro fades and opens Home (about 8.3 s; Skip at any time).
+ * reveal, then the intro fades and opens Home (about 5.6 s).
  * Shown once per session; this is the only place the holding logo appears.
  */
 export function IntroAnimation() {
@@ -87,20 +93,8 @@ export function IntroAnimation() {
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-9 overflow-hidden bg-bg px-5 py-12 text-ink">
-      <Link
-        href={`/${target}`}
-        onClick={(e) => {
-          e.preventDefault();
-          left.current = true;
-          go(target);
-        }}
-        className="fixed end-6 top-[22px] z-10 inline-flex min-h-10 items-center rounded-full border border-ink/20 bg-white/70 px-[18px] text-sm font-medium text-ink no-underline hover:border-ink/45"
-        lang={target}
-      >
-        {target === "ar" ? "تخطي" : "Skip"}
-      </Link>
 
-      <div ref={rootRef} className="intro-root flex flex-col items-center gap-9">
+      <div ref={rootRef} className="intro-root flex flex-col items-center gap-9" style={{ "--k": INTRO_SPEED } as CSSProperties}>
         <div className="lg-wrap relative flex items-center justify-center">
           <div
             aria-hidden
@@ -151,7 +145,7 @@ function Strokes({ className, color }: { className: string; color: string }) {
         <path
           key={i}
           d={d}
-          style={{ strokeDasharray: len, strokeDashoffset: len, animationDelay: `${delay}s`, animationDuration: `${dur}s` }}
+          style={{ strokeDasharray: len, strokeDashoffset: len, animationDelay: `${delay * INTRO_SPEED}s`, animationDuration: `${dur * INTRO_SPEED}s` }}
         />
       ))}
     </g>
